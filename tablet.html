@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#EAF4FE">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
 <title>놀이팝</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap" rel="stylesheet">
@@ -140,6 +144,7 @@
 </div>
 
 <button id="resetLink">반 연결 해제</button>
+<button id="fsBtn" style="position:fixed; left:16px; bottom:14px; font-size:12px; opacity:.4; background:none; border:none; color:var(--navy); cursor:pointer">⛶ 전체화면</button>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
@@ -246,6 +251,12 @@ async function connectByCode() {
 }
 document.getElementById('codeBtn').addEventListener('click', connectByCode);
 document.getElementById('codeInput').addEventListener('keydown', e => { if (e.key === 'Enter') connectByCode(); });
+
+/* 전체화면 켜기/끄기 (선생님용 — 브라우저에서 열었을 때) */
+document.getElementById('fsBtn').addEventListener('click', () => {
+  if (document.fullscreenElement) document.exitFullscreen();
+  else document.documentElement.requestFullscreen().catch(() => {});
+});
 
 /* 반 연결 해제 (태블릿을 다른 반으로 옮길 때) */
 document.getElementById('resetLink').addEventListener('click', () => {
