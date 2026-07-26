@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>놀이팝 · 유아 디지털 역량 & AI 리터러시 안내</title>
+<meta name="description" content="유아 디지털 역량 6대 영역과 유아 AI 리터러시 5요소를 쉽게 정리한 교사용 안내">
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #FFFAF0; --sky: #EAF4FE; --navy: #1E3A5F; --sun: #FFC93C;
+    --coral: #FF7B6B; --white: #fff; --line: #F0E6D2;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: sans-serif; color: var(--navy);
+    background-color: var(--cream);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cellipse cx='22' cy='22' rx='11' ry='8' fill='none' stroke='%23F2E3C2' stroke-width='1.6'/%3E%3Cellipse cx='68' cy='66' rx='11' ry='8' fill='none' stroke='%23F2E3C2' stroke-width='1.6'/%3E%3C/svg%3E");
+  }
+  .wrap { max-width: 820px; margin: 0 auto; padding: 0 20px 60px; }
+  nav { display: flex; align-items: center; gap: 10px; padding: 18px 0; }
+  .logo { font-family: 'Jua', sans-serif; font-size: 24px; text-decoration: none; color: var(--navy); }
+  .logo .pop { color: var(--coral); }
+  .nav-right { margin-left: auto; display: flex; gap: 8px; }
+  .btn {
+    font-size: 14px; font-weight: 600; border: none; border-radius: 12px;
+    padding: 10px 18px; cursor: pointer; text-decoration: none; display: inline-block;
+    color: var(--navy); text-align: center;
+  }
+  .btn-primary { background: var(--sun); }
+  .btn-ghost { background: var(--white); }
+
+  .badge-year {
+    display: inline-block; font-family: 'Jua', sans-serif; font-size: 14px;
+    background: var(--coral); color: var(--white); border-radius: 999px;
+    padding: 5px 16px; margin: 22px 0 10px;
+  }
+  h1 { font-family: 'Jua', sans-serif; font-weight: 400; font-size: 32px; word-break: keep-all; color: #D85A30; }
+  .intro { font-size: 15px; opacity: .8; line-height: 1.85; word-break: keep-all; margin: 14px 0 24px; }
+
+  /* 알약 라벨 정보 행 (교육부 페이지 스타일) */
+  .info-row { display: flex; align-items: flex-start; gap: 14px; margin: 11px 0; }
+  .info-tag {
+    flex-shrink: 0; font-family: 'Jua', sans-serif; font-size: 13.5px;
+    background: var(--sun); border-radius: 999px; padding: 7px 18px; min-width: 96px; text-align: center;
+  }
+  .info-body { font-size: 14.5px; line-height: 1.7; padding-top: 6px; word-break: keep-all; }
+  .info-body small { display: block; font-size: 12.5px; opacity: .6; }
+
+  /* 큰 세그먼트 탭 */
+  .big-tabs {
+    display: flex; background: var(--white); border-radius: 18px; overflow: hidden;
+    box-shadow: 0 4px 14px rgba(30,58,95,.08); margin: 34px 0 22px;
+  }
+  .big-tab {
+    flex: 1; font-family: 'Jua', sans-serif; font-size: 17px; padding: 18px 10px;
+    border: none; cursor: pointer; background: var(--white); color: var(--navy);
+    opacity: .55; transition: all .2s ease;
+  }
+  .big-tab.on { background: var(--navy); color: var(--white); opacity: 1; }
+
+  .src { font-size: 12.5px; opacity: .55; margin: 0 4px 16px; line-height: 1.7; word-break: keep-all; }
+
+  .item {
+    background: var(--white); border-radius: 18px; padding: 20px 22px; margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(30,58,95,.05);
+    display: flex; gap: 16px; align-items: flex-start;
+  }
+  .item .no {
+    flex-shrink: 0; font-family: 'Jua', sans-serif; width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-size: 15px;
+    background: var(--sky);
+  }
+  .item .name { font-size: 16.5px; font-weight: 700; }
+  .item .en { font-size: 12px; opacity: .5; font-weight: 400; margin-left: 6px; }
+  .item .detail { font-size: 14px; opacity: .82; line-height: 1.8; margin-top: 6px; word-break: keep-all; }
+  .item .ex {
+    font-size: 13px; margin-top: 9px; background: var(--cream); border-radius: 10px;
+    padding: 8px 12px; line-height: 1.65; word-break: keep-all;
+  }
+  .cta-band { background: var(--navy); color: var(--white); border-radius: 22px; text-align: center; padding: 34px 22px; margin-top: 40px; }
+  .cta-band h3 { font-family: 'Jua', sans-serif; font-weight: 400; font-size: 21px; margin-bottom: 8px; }
+  .cta-band p { font-size: 13.5px; opacity: .8; margin-bottom: 18px; }
+  .cta-band .btn { background: var(--sun); }
+  .state { text-align: center; padding: 30px; opacity: .5; }
+</style>
+<link rel="stylesheet" href="css/pop.css">
+<style>
+  /* pop.css의 회색 배경을 크림+팝콘 패턴으로 되돌리기 */
+  body {
+    background-color: #FFFAF0 !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cellipse cx='22' cy='22' rx='11' ry='8' fill='none' stroke='%23F2E3C2' stroke-width='1.6'/%3E%3Cellipse cx='68' cy='66' rx='11' ry='8' fill='none' stroke='%23F2E3C2' stroke-width='1.6'/%3E%3C/svg%3E") !important;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <a class="logo" href="index.html">놀이<span class="pop">팝</span> 🍿</a>
+    <div class="nav-right">
+      <a class="btn btn-ghost" href="library.html">라이브러리</a>
+      <a class="btn btn-primary" href="auth.html" id="navCta">시작하기</a>
+    </div>
+  </nav>
+
+  <span class="badge-year">교사 안내</span>
+  <h1>유아 디지털 역량 & AI 리터러시</h1>
+  <p class="intro">
+    태블릿과 AI 스피커가 이미 교실과 가정에 들어와 있어요. 이제 질문은 "쓸까 말까"가 아니라
+    <b>"어떤 역량을 기르며 어떻게 쓸까"</b>입니다. 놀이팝은 국가 수준 자료의 두 가지 틀로 모든 놀이를 분류해요.
+  </p>
+
+  <div class="info-row"><span class="info-tag">누구에게</span>
+    <div class="info-body">디지털 놀이를 쓰는 모든 유아교사 <small>※ 개념을 몰라도 괜찮아요 — 태그를 고르는 과정이 곧 미니 연수가 돼요</small></div></div>
+  <div class="info-row"><span class="info-tag">무엇을</span>
+    <div class="info-body">디지털 역량 6대 영역 + AI 리터러시 5요소를 쉬운 말과 놀이 예시로</div></div>
+  <div class="info-row"><span class="info-tag">어디에</span>
+    <div class="info-body">놀이 등록할 때 태그로, 라이브러리에서 "우리 반에 필요한 역량"으로 검색할 때</div></div>
+
+  <div class="big-tabs">
+    <button class="big-tab on" id="tabComp">🌟 디지털 역량 6대 영역</button>
+    <button class="big-tab" id="tabAi">🤖 AI 리터러시 5요소</button>
+  </div>
+
+  <div id="panelComp">
+    <p class="src">출처: 교육부·경기도교육청 「유아의 균형 있는 디지털 역량을 기르기 위한 교육 자료」(현장지원자료)를 쉽게 풀어 쓴 것</p>
+    <div id="compList"><p class="state">불러오는 중…</p></div>
+  </div>
+
+  <div id="panelAi" style="display:none">
+    <p class="src">출처: OECD·유네스코 AI 역량 체계 기반 유아 AI 교육 자료(2026 교육부 디지털 선도교원 워크숍 전달연수)를 쉽게 풀어 쓴 것<br>
+    핵심 태도: AI는 "생각하는 사람"이 아니라 도구예요. 유아의 생각이 먼저, AI는 넓혀주는 역할 — 언제나 안전(개인정보 입력 금지)과 투명함(AI가 도왔음을 알리기)이 함께해요.</p>
+    <div id="aiList"><p class="state">불러오는 중…</p></div>
+  </div>
+
+  <div class="cta-band">
+    <h3>이 역량들로 분류된 놀이가 기다리고 있어요 🍿</h3>
+    <p>역량별로 찾고, 우리 반 태블릿에 담고, 내 놀이도 나눠보세요.</p>
+    <a class="btn" href="auth.html" id="bandCta">무료로 시작하기</a>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/common.js"></script>
+<script>
+const NO_BG = ['#EAF4FE', '#FFF4D6', '#E4F6EF', '#F0ECFB', '#FDEEE9', '#E8EEFB'];
+
+function setTab(which) {
+  document.getElementById('tabComp').classList.toggle('on', which === 'comp');
+  document.getElementById('tabAi').classList.toggle('on', which === 'ai');
+  document.getElementById('panelComp').style.display = which === 'comp' ? 'block' : 'none';
+  document.getElementById('panelAi').style.display = which === 'ai' ? 'block' : 'none';
+}
+document.getElementById('tabComp').addEventListener('click', () => setTab('comp'));
+document.getElementById('tabAi').addEventListener('click', () => setTab('ai'));
+
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    document.getElementById('navCta').textContent = '내 관리 페이지';
+    document.getElementById('navCta').href = 'my.html';
+    document.getElementById('bandCta').textContent = '라이브러리에서 찾아보기 →';
+    document.getElementById('bandCta').href = 'library.html';
+  }
+  try {
+    const settings = await loadSettings();
+    // 등록 팝업과 같은 데이터 — 관리자 설정에서 문구를 고치면 여기도 함께 바뀜
+    const card = (c, i, enKey) => `
+      <div class="item">
+        <div class="no" style="background:${NO_BG[i % NO_BG.length]}">${c.emoji || (i + 1)}</div>
+        <div>
+          <div class="name">영역 ${i + 1} · ${esc(c.name)}<span class="en">${esc(c[enKey] || '')}</span></div>
+          <div class="detail">${esc(c.detail || c.desc || '')}</div>
+          <div class="ex">💡 이런 놀이예요: ${esc(c.ex || '')}</div>
+        </div>
+      </div>`;
+    document.getElementById('compList').innerHTML =
+      (settings.competencies || []).map((c, i) => card(c, i, 'full')).join('');
+    document.getElementById('aiList').innerHTML =
+      (settings.ai_elements || []).map((c, i) => card(c, i, 'en')).join('');
+  } catch (e) {
+    console.error(e);
+    document.getElementById('compList').innerHTML = '<p class="state">불러오지 못했어요. 새로고침 해주세요.</p>';
+  }
+})();
+</script>
+</body>
+</html>

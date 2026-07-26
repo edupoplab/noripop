@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>놀이팝 · 공유 라이브러리</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #EAF4FE; --navy: #1E3A5F; --sun: #FFC93C;
+    --coral: #FF7B6B; --mint: #6ED3BF; --white: #fff; --line: #DCE8F5;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Gowun Dodum', sans-serif; background: #F7FAFE; color: var(--navy); }
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 24px 20px 80px; }
+  .topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+  .topbar h1 { font-family: 'Jua', sans-serif; font-weight: 400; font-size: 24px; }
+  .topbar h1 .pop { color: var(--coral); }
+  .top-right { margin-left: auto; display: flex; gap: 8px; }
+  .btn {
+    font-family: 'Jua', sans-serif; font-size: 15px; border: none; border-radius: 12px;
+    padding: 11px 20px; cursor: pointer;
+  }
+  .btn-primary { background: var(--sun); color: var(--navy); }
+  .btn-ghost { background: var(--sky); color: var(--navy); }
+  .mini { font-size: 13px; padding: 7px 12px; border-radius: 10px; }
+  .panel { background: var(--white); border: 1px solid var(--line); border-radius: 18px; padding: 18px 22px; margin-bottom: 20px; }
+  .f-row { display: flex; gap: 8px; align-items: baseline; margin: 8px 0; flex-wrap: wrap; }
+  .f-label { font-size: 12.5px; opacity: .55; width: 58px; flex-shrink: 0; }
+  .chip {
+    font-family: inherit; font-size: 13.5px; padding: 7px 13px; border-radius: 999px;
+    border: 1.5px solid var(--line); background: var(--white); color: var(--navy); cursor: pointer;
+  }
+  .chip.on { background: var(--navy); border-color: var(--navy); color: var(--white); }
+  .chip.pick.on { background: var(--sun); border-color: var(--sun); color: var(--navy); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 18px; }
+  .card {
+    background: var(--white); border: 1px solid var(--line); border-radius: 18px;
+    overflow: hidden; display: flex; flex-direction: column;
+  }
+  .thumb-wrap { position: relative; }
+  .card img.thumb, .card .ph { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; background: var(--sky); }
+  .card .ph { display: flex; align-items: center; justify-content: center; font-family: 'Jua', sans-serif; font-size: 44px; color: var(--white); }
+  .pick-badge {
+    position: absolute; top: 10px; left: 10px; font-family: 'Jua', sans-serif; font-size: 12px;
+    background: var(--sun); border-radius: 999px; padding: 4px 10px; box-shadow: 0 2px 4px rgba(30,58,95,.15);
+  }
+  .card-body { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 7px; flex: 1; }
+  .card-title { font-family: 'Jua', sans-serif; font-size: 16px; line-height: 1.35; word-break: keep-all; }
+  .card-meta { font-size: 12px; opacity: .6; line-height: 1.5; }
+  .card-owner { font-size: 12.5px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .lv { background: var(--sky); border-radius: 999px; padding: 2px 9px; font-size: 11.5px; }
+  .saves { margin-left: auto; font-size: 12px; opacity: .7; }
+  .card-btns { display: flex; gap: 7px; margin-top: auto; }
+  .card-btns .btn { flex: 1; }
+  .state { text-align: center; padding: 70px 20px; font-family: 'Jua', sans-serif; font-size: 20px; opacity: .55; }
+
+  .modal { position: fixed; inset: 0; background: rgba(30,58,95,.45); display: none; align-items: center; justify-content: center; z-index: 50; padding: 20px; }
+  .modal.open { display: flex; }
+  .sheet { background: var(--white); border-radius: 22px; padding: 26px; width: 100%; max-width: 400px; }
+  .sheet h3 { font-family: 'Jua', sans-serif; font-weight: 400; font-size: 19px; margin-bottom: 6px; }
+  .sheet p { font-size: 13px; opacity: .65; margin-bottom: 14px; }
+  .class-list { display: flex; flex-direction: column; gap: 8px; }
+  .class-item {
+    font-family: 'Jua', sans-serif; font-size: 16px; text-align: left;
+    padding: 13px 16px; border: 1.5px solid var(--line); border-radius: 12px;
+    background: var(--white); color: var(--navy); cursor: pointer;
+  }
+  .class-item:hover { border-color: var(--sun); background: rgba(255,201,60,.08); }
+  .toast {
+    position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%);
+    background: var(--navy); color: var(--white); font-family: 'Jua', sans-serif;
+    padding: 13px 24px; border-radius: 999px; font-size: 15px; display: none; z-index: 60;
+    box-shadow: 0 6px 16px rgba(30,58,95,.3);
+  }
+</style>
+<link rel="stylesheet" href="css/pop.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <h1>놀이<span class="pop">팝</span> · 공유 라이브러리 🍿</h1>
+    <div class="top-right" id="topRight"></div>
+  </div>
+
+  <div class="panel">
+    <div class="big-tabs">
+      <button class="big-tab on" id="catPlay">🎠 놀이</button>
+      <button class="big-tab" id="catWork">📋 업무 자료</button>
+    </div>
+    <div id="playFilters">
+    <div class="grp grp-theme"><label>🌈 놀이 주제</label><div class="chip-grid" id="filterTheme"></div></div>
+    <div class="grp grp-type"><label>🎠 활동 유형</label><div class="chip-grid" id="filterType"></div></div>
+    <div class="grp grp-age"><label>🎈 연령</label><div class="chip-grid" id="filterAge"></div></div>
+    <div class="grp grp-dev"><label>📱 구현 기기</label><div class="chip-grid" id="filterDevice"></div></div>
+    <div class="grp grp-comp"><label>🌟 디지털 역량</label><div class="chip-grid" id="filterComp"></div></div>
+    <div class="grp grp-ai"><label>🤖 AI 리터러시</label><div class="chip-grid" id="filterAi"></div></div>
+    <div class="grp">
+      <label>⭐ 모아보기</label>
+      <div class="chip-row">
+        <button class="chip pick" id="pickOnly">🏅 에디터 픽만</button>
+        <button class="chip" id="sortSaves">🍿 담김 많은 순</button>
+      </div>
+    </div>
+    </div>
+    <div id="workFilters" style="display:none">
+      <div class="grp grp-work"><label>📁 자료 분류</label><div class="chip-grid" id="filterWorkCat"></div></div>
+    </div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <div class="state" id="stateMsg">공개된 놀이를 불러오고 있어요…</div>
+</div>
+
+<!-- 반 선택 모달 -->
+<div class="modal" id="classModal">
+  <div class="sheet">
+    <h3>어느 반에 담을까요?</h3>
+    <p id="pickTitle"></p>
+    <div class="class-list" id="classList"></div>
+    <div style="margin-top:14px; text-align:right">
+      <button class="btn btn-ghost mini" id="pickCancel">취소</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/common.js"></script>
+<script>
+const PALETTE = ['#6ED3BF', '#FFC93C', '#FF7B6B', '#8FB8F6', '#C9A0F0'];
+
+let settings = {};
+let session = null;
+let myProfile = null;
+let myClasses = [];
+let items = [];       // 공개 놀이 + 작성자 정보
+let pickPlayId = null;
+let filters = { cat: '놀이', theme: '전체', type: '전체', age: '전체', device: '전체', comp: '전체', ai: '전체', workCat: '전체', pickOnly: false, sortSaves: false };
+
+/* 놀이/업무 구분 탭 */
+function setLibCat(cat) {
+  filters.cat = cat;
+  document.getElementById('catPlay').classList.toggle('on', cat === '놀이');
+  document.getElementById('catWork').classList.toggle('on', cat === '업무');
+  document.getElementById('playFilters').style.display = cat === '놀이' ? 'block' : 'none';
+  document.getElementById('workFilters').style.display = cat === '업무' ? 'block' : 'none';
+  render();
+}
+document.getElementById('catPlay').addEventListener('click', () => setLibCat('놀이'));
+document.getElementById('catWork').addEventListener('click', () => setLibCat('업무'));
+
+(async () => {
+  // 로딩 중엔 스켈레톤 카드 표시
+  document.getElementById('stateMsg').style.display = 'none';
+  document.getElementById('grid').innerHTML = '<div class="skel skel-card"></div>'.repeat(4);
+  try {
+    settings = await loadSettings();
+    const { data: { session: s } } = await sb.auth.getSession();
+    session = s;
+    renderTop();
+    buildFilters();
+    await loadItems();
+    if (session) {
+      myProfile = await loadMyProfile(session.user.id);
+      const { data } = await sb.from('classes').select('*').eq('owner_id', myProfile.id).order('created_at');
+      myClasses = data || [];
+    }
+    render();
+  } catch (e) {
+    document.getElementById('grid').innerHTML = '';
+    const st = document.getElementById('stateMsg');
+    st.style.display = 'block';
+    st.textContent = '불러오지 못했어요. 새로고침 해주세요.';
+    console.error(e);
+  }
+})();
+
+function renderTop() {
+  const box = document.getElementById('topRight');
+  box.innerHTML = session
+    ? `<a class="btn btn-ghost mini" href="my.html" style="text-decoration:none">🏠 내 관리 페이지</a>`
+    : `<a class="btn btn-primary mini" href="auth.html" style="text-decoration:none">로그인 · 가입하기</a>`;
+}
+
+async function loadItems() {
+  // 공개 놀이 (게스트도 조회 가능 — RLS가 public만 허용)
+  // 게스트에게는 url 컬럼 권한이 없어서 명시적으로 컬럼을 지정 (로그인 시에만 url 포함)
+  const cols = 'id,owner_id,category,title,ages,themes,types,source,thumb_url,description,'
+    + 'visibility,editor_pick,save_count,created_at,competencies,devices,work_category,is_ai,ai_elements'
+    + (session ? ',url,open_mode' : '');
+  const { data: plays, error } = await sb.from('plays').select(cols)
+    .eq('visibility', 'public').order('created_at', { ascending: false });
+  if (error) throw error;
+  // 작성자 닉네임·레벨 (공개 뷰)
+  const ownerIds = [...new Set((plays || []).map(p => p.owner_id))];
+  let owners = {};
+  if (ownerIds.length) {
+    const { data: profs } = await sb.from('public_profiles').select('*').in('id', ownerIds);
+    (profs || []).forEach(p => owners[p.id] = p);
+  }
+  items = (plays || []).map(p => ({ ...p, owner: owners[p.owner_id] || { nickname: '?', points: 0 } }));
+}
+
+/* ───── 필터 ───── */
+function buildFilters() {
+  buildRow('filterTheme', 'theme', settings.themes || []);
+  buildRow('filterType', 'type', settings.types || []);
+  buildRow('filterAge', 'age', (settings.ages || []).map(a => a + '세'));
+  buildRow('filterDevice', 'device', settings.devices || []);
+  buildRow('filterComp', 'comp', (settings.competencies || []).map(c => c.name));
+  buildRow('filterWorkCat', 'workCat', settings.work_categories || []);
+  buildRow('filterAi', 'ai', ['AI 활용 놀이', ...(settings.ai_elements || []).map(e => e.name)]);
+  document.getElementById('pickOnly').addEventListener('click', e => {
+    filters.pickOnly = !filters.pickOnly;
+    e.target.classList.toggle('on', filters.pickOnly);
+    render();
+  });
+  document.getElementById('sortSaves').addEventListener('click', e => {
+    filters.sortSaves = !filters.sortSaves;
+    e.target.classList.toggle('on', filters.sortSaves);
+    render();
+  });
+}
+function buildRow(boxId, key, options) {
+  const box = document.getElementById(boxId);
+  box.innerHTML = '';
+  ['전체', ...options].forEach(opt => {
+    const c = document.createElement('button');
+    c.className = 'chip' + (filters[key] === opt ? ' on' : '');
+    c.textContent = opt;
+    c.addEventListener('click', () => { filters[key] = opt; buildRow(boxId, key, options); render(); });
+    box.appendChild(c);
+  });
+}
+
+/* ───── 카드 렌더 ───── */
+function render() {
+  const grid = document.getElementById('grid');
+  const stateMsg = document.getElementById('stateMsg');
+  let shown = items.filter(p => {
+    if ((p.category || '놀이') !== filters.cat) return false;
+    if (filters.cat === '업무') {
+      return filters.workCat === '전체' || p.work_category === filters.workCat;
+    }
+    if (filters.theme !== '전체' && !(p.themes || []).includes(filters.theme)) return false;
+    if (filters.type !== '전체' && !(p.types || []).includes(filters.type)) return false;
+    if (filters.age !== '전체' && !(p.ages || []).includes(filters.age.replace('세', ''))) return false;
+    if (filters.device !== '전체' && !(p.devices || []).includes(filters.device)) return false;
+    if (filters.comp !== '전체' && !(p.competencies || []).includes(filters.comp)) return false;
+    if (filters.ai !== '전체') {
+      if (filters.ai === 'AI 활용 놀이') { if (!p.is_ai) return false; }
+      else if (!(p.ai_elements || []).includes(filters.ai)) return false;
+    }
+    if (filters.pickOnly && !p.editor_pick) return false;
+    return true;
+  });
+  if (filters.sortSaves) shown = shown.slice().sort((a, b) => b.save_count - a.save_count);
+
+  grid.innerHTML = '';
+  if (shown.length === 0) {
+    stateMsg.textContent = filters.cat === '업무'
+      ? '아직 공유된 업무 자료가 없어요. 첫 자료를 공유해 주세요!'
+      : (items.length === 0 ? '아직 공개된 놀이가 없어요. 첫 번째 팝콘을 터뜨려 주세요! 🍿' : '조건에 맞는 놀이가 없어요.');
+    stateMsg.style.display = 'block';
+    return;
+  }
+  stateMsg.style.display = 'none';
+
+  shown.forEach((p, i) => {
+    const lv = levelOf(p.owner.points, settings.level_thresholds);
+    const div = document.createElement('div');
+    div.className = 'card';
+    const thumb = p.thumb_url
+      ? `<img class="thumb" src="${esc(p.thumb_url)}" alt="" loading="lazy">`
+      : `<div class="ph" style="background:${PALETTE[i % PALETTE.length]}">${esc(p.title.charAt(0))}</div>`;
+    div.innerHTML = `
+      <div class="thumb-wrap">${thumb}${p.editor_pick ? '<span class="pick-badge">🏅 에디터 픽</span>' : ''}${p.is_ai ? '<span class="pick-badge" style="top:auto; bottom:10px; background:#E8EEFB; color:#3B57A9">🤖 AI</span>' : ''}</div>
+      <div class="card-body">
+        <div class="card-title">${esc(p.title)}</div>
+        <div class="card-meta">${p.category === '업무'
+          ? (p.work_category ? '📁 ' + esc(p.work_category) : '📋 업무 자료')
+          : `${(p.ages || []).map(a => a + '세').join('·')}${(p.devices || []).length ? '　📱 ' + esc((p.devices || []).join('·')) : ''}　${esc((p.themes || []).join(', '))}`}</div>
+        ${(p.competencies || []).length ? `<div style="display:flex; gap:5px; flex-wrap:wrap">${(p.competencies || []).map(n => {
+          const c = (settings.competencies || []).find(x => x.name === n);
+          return `<span class="lv" title="${esc(c ? c.desc : '')}">${c?.emoji || ''} ${esc(n)}</span>`;
+        }).join('')}</div>` : ''}
+        <div class="card-owner">
+          <span>${esc(p.owner.nickname)}</span>
+          <span class="lv">${lv.emoji || '🍿'} ${esc(lv.name)}</span>
+          ${p.category === '업무' ? '' : `<span class="saves">🍿 담김 ${p.save_count}</span>`}
+        </div>
+        <div class="card-btns">
+          <button class="btn btn-ghost mini" data-prev>미리보기</button>
+          ${p.category === '업무'
+            ? '<button class="btn btn-primary mini" data-copy>링크 복사</button>'
+            : '<button class="btn btn-primary mini" data-save>내 교실에 담기</button>'}
+        </div>
+      </div>`;
+    // 게스트는 미리보기·복사 불가 → 로그인 유도 (주소는 서버에서 아예 안 내려옴)
+    const needLogin = () => {
+      if (confirm('놀이를 열어보려면 로그인이 필요해요.\n지금 가입하면 오픈 멤버 혜택도 받을 수 있어요! 가입 화면으로 갈까요?')) location.href = 'auth.html';
+    };
+    div.querySelector('[data-prev]').addEventListener('click', () => {
+      if (!session || !p.url) return needLogin();
+      window.open(p.url, '_blank', 'noopener,width=1100,height=750');
+    });
+    const saveBtn = div.querySelector('[data-save]');
+    if (saveBtn) saveBtn.addEventListener('click', () => startSave(p));
+    const copyBtn = div.querySelector('[data-copy]');
+    if (copyBtn) copyBtn.addEventListener('click', async () => {
+      if (!session || !p.url) return needLogin();
+      try { await navigator.clipboard.writeText(p.url); copyBtn.textContent = '복사됨!'; }
+      catch (e) { prompt('아래 링크를 복사하세요:', p.url); }
+      setTimeout(() => copyBtn.textContent = '링크 복사', 1500);
+    });
+    grid.appendChild(div);
+  });
+}
+
+/* ───── 내 교실에 담기 ───── */
+function startSave(p) {
+  if (!session) {
+    if (confirm('담기는 로그인이 필요해요. 로그인 화면으로 갈까요?')) location.href = 'auth.html';
+    return;
+  }
+  if (!isPlusDate(myProfile.plus_expires_at) && p.owner_id !== myProfile.id) {
+    alert('공유 라이브러리 담기는 플러스 회원 기능이에요.\n공개 놀이를 등록하면 플러스 기간이 적립돼요! 🍿');
+    return;
+  }
+  if (myClasses.length === 0) {
+    if (confirm('아직 만든 반이 없어요. 관리 페이지에서 반을 먼저 만들까요?')) location.href = 'my.html';
+    return;
+  }
+  pickPlayId = p.id;
+  document.getElementById('pickTitle').textContent = `"${p.title}"`;
+  const list = document.getElementById('classList');
+  list.innerHTML = '';
+  myClasses.forEach(c => {
+    const b = document.createElement('button');
+    b.className = 'class-item';
+    b.textContent = c.name;
+    b.addEventListener('click', () => doSave(c));
+    list.appendChild(b);
+  });
+  document.getElementById('classModal').classList.add('open');
+}
+
+async function doSave(cls) {
+  document.getElementById('classModal').classList.remove('open');
+  try {
+    const { data, error } = await sb.rpc('save_to_class', { p_play: pickPlayId, p_class: cls.id });
+    if (error) throw error;
+    toast(data === 'own'
+      ? `내 놀이를 ${cls.name}에 담았어요!`
+      : `${cls.name}에 담았어요! 만든 선생님에게 팝콘이 터졌어요 🍿`);
+    await loadItems(); render(); // 담김 수 갱신
+  } catch (e) {
+    alert(e.message || '담기에 실패했어요.');
+  }
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2600);
+}
+document.getElementById('pickCancel').addEventListener('click', () => document.getElementById('classModal').classList.remove('open'));
+</script>
+</body>
+</html>

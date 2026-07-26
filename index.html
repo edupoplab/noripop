@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>놀이팝 — 아이디어가 팝! 터지는 유아교사 놀이 플랫폼</title>
+<meta name="description" content="유아교사가 직접 만든 디지털 놀이를 등록하고, 우리 반 태블릿에 배포하고, 전국 선생님과 공유하는 플랫폼">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #EAF4FE; --navy: #1E3A5F; --sun: #FFC93C;
+    --coral: #FF7B6B; --mint: #6ED3BF; --lav: #C9A0F0; --white: #fff; --line: #DCE8F5;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: sans-serif; background: #F8FAFC; color: var(--navy); }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+  .btn {
+    font-size: 14px; font-weight: 600; border: none; border-radius: 12px;
+    padding: 10px 18px; cursor: pointer; text-decoration: none; display: inline-block;
+    color: var(--navy); text-align: center;
+  }
+  .btn-primary { background: var(--sun); }
+  .btn-ghost { background: var(--white); }
+  .btn-big { font-size: 16px; padding: 14px 28px; border-radius: 14px; }
+
+  nav { display: flex; align-items: center; gap: 10px; padding: 18px 0; }
+  .logo { font-family: 'Jua', sans-serif; font-size: 24px; text-decoration: none; color: var(--navy); }
+  .logo .pop { color: var(--coral); }
+  .nav-right { margin-left: auto; display: flex; gap: 8px; }
+
+  /* ── 히어로: 하늘색 밴드 + 팝콘 장식 + 태블릿 목업 ── */
+  .hero-band { background: var(--sky); position: relative; overflow: hidden; }
+  .pop-deco { position: absolute; font-size: 34px; opacity: .5; user-select: none; }
+  .hero {
+    display: grid; grid-template-columns: 1.1fr .9fr; gap: 30px; align-items: center;
+    padding: 54px 0 60px; position: relative;
+  }
+  @media (max-width: 860px) { .hero { grid-template-columns: 1fr; } .tablet-wrap { display: none; } }
+  .hero h1 { font-family: 'Jua', sans-serif; font-size: 42px; font-weight: 400; line-height: 1.3; word-break: keep-all; }
+  .hero h1 .pop { color: var(--coral); }
+  .hero p.sub { font-size: 16.5px; opacity: .75; margin: 16px 0 6px; line-height: 1.75; word-break: keep-all; }
+  .founding {
+    display: inline-block; background: var(--sun); border-radius: 999px;
+    padding: 10px 20px; font-size: 14px; font-weight: 700; margin: 18px 0 6px;
+    box-shadow: 0 3px 0 rgba(30,58,95,.15);
+  }
+  .cta { display: flex; gap: 12px; margin-top: 22px; flex-wrap: wrap; }
+
+  /* CSS 태블릿 목업 */
+  .tablet-wrap { display: flex; justify-content: center; }
+  .tablet {
+    width: 360px; background: var(--navy); border-radius: 26px; padding: 14px;
+    box-shadow: 0 18px 40px rgba(30,58,95,.25); transform: rotate(2deg);
+  }
+  .tab-screen { background: var(--sky); border-radius: 16px; padding: 14px; }
+  .tab-head { font-family: 'Jua', sans-serif; font-size: 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .tab-head .cls { margin-left: auto; background: var(--white); border-radius: 999px; font-size: 10.5px; padding: 3px 9px; }
+  .tab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+  .t-card { background: var(--white); border-radius: 12px; overflow: hidden; transform: rotate(-1deg); }
+  .t-card:nth-child(even) { transform: rotate(1deg); }
+  .t-thumb { aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; font-size: 34px; }
+  .t-name { font-family: 'Jua', sans-serif; font-size: 12px; padding: 7px 9px 9px; }
+
+  /* ── 3단계 사용법 ── */
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin: 40px 0 8px; }
+  .step { background: var(--white); border-radius: 18px; padding: 22px; position: relative; }
+  .step .num {
+    font-family: 'Jua', sans-serif; width: 34px; height: 34px; border-radius: 50%;
+    background: var(--sun); display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .step h3 { font-size: 15.5px; margin: 12px 0 6px; }
+  .step p { font-size: 13.5px; opacity: .7; line-height: 1.65; word-break: keep-all; }
+
+  section { margin: 46px 0; }
+  section > h2 { font-family: 'Jua', sans-serif; font-weight: 400; font-size: 25px; margin-bottom: 6px; }
+  section > p.sec-sub { font-size: 14px; opacity: .6; margin-bottom: 18px; }
+
+  /* ── 특징: 파스텔 카드 ── */
+  .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+  .feat { border-radius: 18px; padding: 22px; }
+  .feat.f1 { background: #FFF4D6; } .feat.f2 { background: #E4F6EF; }
+  .feat.f3 { background: #F0ECFB; } .feat.f4 { background: #FDEEE9; }
+  .feat .ico { font-size: 32px; }
+  .feat h3 { font-size: 15.5px; margin: 10px 0 6px; }
+  .feat p { font-size: 13.5px; opacity: .75; line-height: 1.65; word-break: keep-all; }
+
+  /* ── 레벨 여정 ── */
+  .journey {
+    background: var(--navy); border-radius: 22px; padding: 28px 26px; color: var(--white);
+  }
+  .journey h2 { font-family: 'Jua', sans-serif; font-weight: 400; font-size: 21px; margin-bottom: 4px; }
+  .journey p { font-size: 13px; opacity: .75; margin-bottom: 18px; }
+  .lv-track { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .lv {
+    background: rgba(255,255,255,.12); border-radius: 999px; padding: 8px 16px;
+    font-size: 13.5px; font-weight: 600; white-space: nowrap;
+  }
+  .lv.hot { background: var(--sun); color: var(--navy); }
+  .lv-arrow { opacity: .5; }
+
+  /* ── 놀이 카드 ── */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+  .card { background: var(--white); border-radius: 16px; overflow: hidden; text-decoration: none; color: inherit; }
+  .card img, .card .ph { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; background: var(--sky); }
+  .card .ph { display: flex; align-items: center; justify-content: center; font-family: 'Jua', sans-serif; font-size: 38px; color: var(--white); }
+  .card-body { padding: 12px 14px; }
+  .card-title { font-size: 14.5px; font-weight: 600; line-height: 1.4; word-break: keep-all; }
+  .card-meta { font-size: 12px; opacity: .6; margin-top: 4px; }
+  .more { text-align: center; margin-top: 18px; }
+  .notice { background: var(--white); border-radius: 14px; padding: 15px 20px; margin-bottom: 10px; }
+  .notice b { font-size: 14.5px; }
+  .notice span { font-size: 12px; opacity: .5; margin-left: 8px; }
+  .notice p { font-size: 13.5px; opacity: .75; margin-top: 5px; line-height: 1.6; white-space: pre-wrap; }
+
+  /* ── 마지막 CTA 밴드 ── */
+  .cta-band { background: var(--sun); border-radius: 22px; text-align: center; padding: 40px 24px; }
+  .cta-band h2 { font-family: 'Jua', sans-serif; font-weight: 400; font-size: 26px; }
+  .cta-band p { font-size: 14px; opacity: .75; margin: 10px 0 18px; }
+  .cta-band .btn { background: var(--navy); color: var(--white); }
+
+  footer { border-top: 1px solid var(--line); margin-top: 50px; padding: 26px 0 40px; font-size: 12.5px; opacity: .65; }
+  footer a { color: var(--navy); margin-right: 14px; }
+  .empty, .state { text-align: center; }
+</style>
+<link rel="stylesheet" href="css/pop.css">
+</head>
+<body>
+
+<div class="hero-band">
+  <span class="pop-deco" style="top:8%; left:4%; transform:rotate(-15deg)">🍿</span>
+  <span class="pop-deco" style="top:64%; left:2%; font-size:22px; transform:rotate(10deg)">🍿</span>
+  <span class="pop-deco" style="top:12%; right:5%; font-size:26px; transform:rotate(18deg)">🌽</span>
+  <span class="pop-deco" style="bottom:8%; right:3%; transform:rotate(-8deg)">🍿</span>
+  <div class="wrap">
+    <nav>
+      <a class="logo" href="index.html">놀이<span class="pop">팝</span> 🍿</a>
+      <div class="nav-right">
+        <a class="btn btn-ghost" href="library.html">놀이 구경하기</a>
+        <a class="btn btn-primary" href="auth.html" id="navCta">시작하기</a>
+      </div>
+    </nav>
+    <div class="hero">
+      <div>
+        <h1>선생님의 놀이 아이디어가<br><span class="pop">팝!</span> 터지는 곳</h1>
+        <p class="sub">내가 만든 디지털 놀이를 등록하고, QR 한 번으로 우리 반 태블릿에 배포하고, 전국 유아교사와 공유해요.</p>
+        <div class="founding" id="foundingBanner" style="display:none"></div>
+        <div class="cta">
+          <a class="btn btn-primary btn-big" href="auth.html" id="heroCta">무료로 시작하기</a>
+          <a class="btn btn-ghost btn-big" href="library.html">라이브러리 구경 →</a>
+        </div>
+      </div>
+      <div class="tablet-wrap">
+        <div class="tablet"><div class="tab-screen">
+          <div class="tab-head">🍿 놀이팝 <span class="cls">햇님반</span></div>
+          <div class="tab-grid">
+            <div class="t-card"><div class="t-thumb" style="background:#6ED3BF">🐠</div><div class="t-name">바닷속 숫자 찾기</div></div>
+            <div class="t-card"><div class="t-thumb" style="background:#FFC93C">✏️</div><div class="t-name">한글 미로 게임</div></div>
+            <div class="t-card"><div class="t-thumb" style="background:#FF7B6B">🎨</div><div class="t-name">내 마음 색칠하기</div></div>
+            <div class="t-card"><div class="t-thumb" style="background:#C9A0F0">🎵</div><div class="t-name">동물 소리 퀴즈</div></div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="steps">
+    <div class="step"><div class="num">1</div><h3>링크만 붙여넣어 등록</h3><p>Canva 사이트, 웹 게임 등 주소만 붙여넣으면 끝. 미리 채워진 양식의 000만 고치면 사용안내도 완성돼요.</p></div>
+    <div class="step"><div class="num">2</div><h3>QR 한 번으로 태블릿 연결</h3><p>반을 만들면 전용 QR이 생겨요. 태블릿 카메라로 찍으면 바로 우리 반 놀이 화면 — 아이는 로그인이 없어요.</p></div>
+    <div class="step"><div class="num">3</div><h3>공유하고 적립받기</h3><p>전체 공개로 승인되면 플러스 +2주, 에디터 픽은 +2개월. 나눌수록 계속 무료로 쓸 수 있어요.</p></div>
+  </div>
+
+  <section>
+    <h2>놀이팝이 특별한 이유</h2>
+    <p class="sec-sub">유아교사가 만들고, 유아교사가 검수하고, 유아교사가 함께 키우는 플랫폼</p>
+    <div class="features">
+      <div class="feat f1"><div class="ico">🎠</div><h3>등록하면 바로 우리 반 태블릿에</h3><p>기관 계정이 아니라 선생님 개인 계정. 이직·이동해도 내 놀이는 내 것이에요.</p></div>
+      <div class="feat f2"><div class="ico">🍿</div><h3>거절 없는 적립 구조</h3><p>검수에서 반려돼도 탈락이 아니라 "수정 안내". 교실에서는 그대로 쓰면서 고쳐서 다시 공개할 수 있어요.</p></div>
+      <div class="feat f3"><div class="ico">🌟</div><h3>유아 디지털 역량 기반 분류</h3><p>교육부·경기도교육청 현장지원자료의 6대 역량으로 분류·검색. 수업 목적에 딱 맞는 놀이를 찾아요.</p></div>
+      <div class="feat f4"><div class="ico">🛡️</div><h3>유아 정보 제로</h3><p>유아 화면은 로그인이 없고, 아이의 어떤 정보도 수집하지 않아요. 수집은 교사 이메일·닉네임뿐.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>국가 수준 자료의 두 가지 틀로 분류해요</h2>
+    <p class="sec-sub">태그를 고르는 것만으로 미니 연수가 되는 분류 체계 — 검색이 곧 수업 설계가 돼요</p>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px">
+      <a href="guide.html" style="text-decoration:none; color:inherit; background:#FDEEE9; border-radius:18px; padding:22px; display:block">
+        <div style="font-size:28px">🌟</div>
+        <h3 style="font-size:16px; margin:10px 0 6px">유아 디지털 역량 6대 영역</h3>
+        <p style="font-size:13px; opacity:.75; line-height:1.6; word-break:keep-all">작동·사용 이해 / 창작·감상 / 문제해결·사고력 / 사회정서 / 안전·건강한 습관 / 소통·참여 — 교육부·교육청 현장지원자료 기반</p>
+      </a>
+      <a href="guide.html" style="text-decoration:none; color:inherit; background:#E8EEFB; border-radius:18px; padding:22px; display:block">
+        <div style="font-size:28px">🤖</div>
+        <h3 style="font-size:16px; margin:10px 0 6px">유아 AI 리터러시 5요소</h3>
+        <p style="font-size:13px; opacity:.75; line-height:1.6; word-break:keep-all">AI 이해 / AI와 창작 / AI로 성찰 / AI 환경·균형 / AI 윤리·안전 — OECD·유네스코 기반 2026 최신 틀</p>
+      </a>
+    </div>
+    <div class="more"><a class="btn btn-ghost" href="guide.html" style="border:1px solid var(--line)">📖 개념 안내 자세히 보기 →</a></div>
+  </section>
+
+  <section id="videoSection" style="display:none">
+    <h2>영상으로 배우는 놀이팝 🎬</h2>
+    <p class="sec-sub">1~2분이면 충분해요 — 보면서 그대로 따라 하세요</p>
+    <div id="videoGrid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px"></div>
+  </section>
+
+  <div class="journey">
+    <h2>담길수록 자라는 팝콘 레벨 👑</h2>
+    <p>다른 선생님이 내 놀이를 교실에 담아갈 때마다 점수가 쌓여요. 레벨은 동료가 인정한 신뢰의 표시!</p>
+    <div class="lv-track">
+      <span class="lv">🌽 알맹이</span><span class="lv-arrow">→</span>
+      <span class="lv">🍿 첫팝</span><span class="lv-arrow">→</span>
+      <span class="lv">팝팝</span><span class="lv-arrow">→</span>
+      <span class="lv">팝콤보</span><span class="lv-arrow">→</span>
+      <span class="lv">⭐ 팝스타</span><span class="lv-arrow">→</span>
+      <span class="lv hot">👑 레전드팝</span>
+    </div>
+  </div>
+
+  <section id="playsSection">
+    <h2>요즘 팝 터진 놀이 🍿</h2>
+    <p class="sec-sub">전국 선생님들이 공개한 놀이 — 가입하면 우리 교실에 담아갈 수 있어요</p>
+    <div class="grid" id="playGrid"></div>
+    <p class="state" id="playState" style="display:none">아직 공개된 놀이가 없어요. 첫 번째 팝콘을 터뜨려 주세요!</p>
+    <div class="more"><a class="btn btn-ghost" href="library.html" style="border:1px solid var(--line)">전체 라이브러리 보기 →</a></div>
+  </section>
+
+  <section id="noticeSection" style="display:none">
+    <h2>공지 📢</h2>
+    <div id="noticeList"></div>
+  </section>
+
+  <div class="cta-band">
+    <h2>오늘 만든 놀이, 내일 아침 우리 반 태블릿에 🍿</h2>
+    <p>가입은 1분, 유아 정보 수집은 0. 오픈 멤버 혜택이 사라지기 전에 시작하세요!</p>
+    <a class="btn btn-big" href="auth.html" id="bandCta">무료로 시작하기</a>
+  </div>
+
+  <footer>
+    <a href="guide.html">역량·AI 리터러시 안내</a><a href="terms.html">이용약관</a><a href="privacy.html">개인정보 처리방침</a>
+    <div style="margin-top:8px">ⓒ 에듀팝랩 EduPop Lab · 유아의 정보는 어떤 것도 수집하지 않아요</div>
+  </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/common.js"></script>
+<script>
+const PALETTE = ['#6ED3BF', '#FFC93C', '#FF7B6B', '#8FB8F6', '#C9A0F0'];
+
+(async () => {
+  document.getElementById('playGrid').innerHTML = '<div class="skel skel-card"></div>'.repeat(4);
+
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    ['navCta', 'heroCta', 'bandCta'].forEach(id => {
+      const el = document.getElementById(id);
+      el.textContent = '내 관리 페이지로 →';
+      el.href = 'my.html';
+    });
+  }
+
+  try {
+    const settings = await loadSettings();
+    if (String(settings.founding_enabled) === 'true') {
+      const days = parseInt(settings.founding_gift_days) || 0;
+      const limit = parseInt(settings.open_member_limit) || 100;
+      if (days > 0) {
+        const b = document.getElementById('foundingBanner');
+        b.innerHTML = `🎉 오픈 멤버 선착순 ${limit}명 — 지금 가입하면 플러스 <b>${Math.round(days / 30)}개월</b> 자동 적립!`;
+        b.style.display = 'inline-block';
+      }
+    }
+  } catch (e) { console.warn(e); }
+
+  // 사용법 영상 (관리자 설정에 유튜브 주소를 넣으면 자동 표시 — 최대 2개)
+  try {
+    const settings2 = await loadSettings();
+    const videos = [
+      { key: 'intro_video_url',  title: '📝 링크 등록, 이렇게 해요' },
+      { key: 'tablet_video_url', title: '📱 우리 반 태블릿 연결하기' }
+    ];
+    const grid = document.getElementById('videoGrid');
+    let shown = 0;
+    videos.forEach(v => {
+      const url = String(settings2[v.key] || '').trim();
+      const m = url.match(/(?:youtu\.be\/|v=|shorts\/|embed\/)([\w-]{11})/);
+      if (!m) return;
+      shown++;
+      const d = document.createElement('div');
+      d.innerHTML = `
+        <div style="position:relative; padding-top:56.25%; border-radius:16px; overflow:hidden; background:var(--navy)">
+          <iframe src="https://www.youtube.com/embed/${m[1]}" style="position:absolute; inset:0; width:100%; height:100%; border:none"
+            title="${v.title}" allow="accelerometer; autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <p style="font-size:14px; font-weight:600; margin-top:9px">${v.title}</p>`;
+      grid.appendChild(d);
+    });
+    if (shown) document.getElementById('videoSection').style.display = 'block';
+  } catch (e) { console.warn(e); }
+
+  // 최신 공개 놀이 8개 (게스트에게는 url이 아예 내려오지 않음 — 카드만)
+  try {
+    const { data: plays } = await sb.from('plays')
+      .select('id,title,thumb_url,ages,save_count,editor_pick')
+      .eq('visibility', 'public').eq('category', '놀이')
+      .order('editor_pick', { ascending: false }).order('save_count', { ascending: false })
+      .limit(8);
+    const grid = document.getElementById('playGrid');
+    grid.innerHTML = '';
+    if (!plays || plays.length === 0) {
+      document.getElementById('playState').style.display = 'block';
+    } else {
+      plays.forEach((p, i) => {
+        const d = document.createElement('a');
+        d.className = 'card';
+        d.href = 'library.html';
+        const thumb = p.thumb_url
+          ? `<img src="${esc(p.thumb_url)}" alt="" loading="lazy">`
+          : `<div class="ph" style="background:${PALETTE[i % PALETTE.length]}">${esc(p.title.charAt(0))}</div>`;
+        d.innerHTML = `${thumb}<div class="card-body">
+          <div class="card-title">${p.editor_pick ? '🏅 ' : ''}${esc(p.title)}</div>
+          <div class="card-meta">${(p.ages || []).map(a => a + '세').join('·')}　🍿 담김 ${p.save_count}</div></div>`;
+        grid.appendChild(d);
+      });
+    }
+  } catch (e) {
+    document.getElementById('playGrid').innerHTML = '';
+    console.warn(e);
+  }
+
+  try {
+    const { data: notices } = await sb.from('announcements').select('*')
+      .order('created_at', { ascending: false }).limit(3);
+    if (notices && notices.length) {
+      document.getElementById('noticeSection').style.display = 'block';
+      document.getElementById('noticeList').innerHTML = notices.map(n =>
+        `<div class="notice"><b>${esc(n.title)}</b><span>${new Date(n.created_at).toLocaleDateString('ko-KR')}</span><p>${esc(n.body)}</p></div>`).join('');
+    }
+  } catch (e) { console.warn(e); }
+})();
+</script>
+</body>
+</html>

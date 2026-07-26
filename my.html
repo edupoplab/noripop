@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>놀이팝 · 교사 관리</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<style>
+  /* ── 기존 admin.html의 차분한 교사 화면 스타일 계승 ── */
+  :root {
+    --sky: #EAF4FE; --navy: #1E3A5F; --sun: #FFC93C;
+    --coral: #FF7B6B; --mint: #6ED3BF; --white: #fff; --line: #DCE8F5;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Gowun Dodum', sans-serif; background: #F7FAFE; color: var(--navy); }
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 24px 20px 80px; }
+
+  /* 상단 바 */
+  .topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+  .topbar h1 { font-family: 'Jua', sans-serif; font-weight: 400; font-size: 24px; }
+  .topbar h1 .pop { color: var(--coral); }
+  .lv-badge {
+    font-family: 'Jua', sans-serif; font-size: 13px; background: var(--sun);
+    border-radius: 999px; padding: 4px 12px;
+  }
+  .plus-tag { font-size: 12.5px; opacity: .65; }
+  .top-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+
+  h2 { font-family: 'Jua', sans-serif; font-weight: 400; font-size: 19px; margin-bottom: 14px; }
+  .cols { display: grid; grid-template-columns: 420px 1fr; gap: 22px; align-items: start; }
+  @media (max-width: 980px) { .cols { grid-template-columns: 1fr; } }
+  .panel { background: var(--white); border: 1px solid var(--line); border-radius: 18px; padding: 22px; }
+  label { display: block; font-size: 13px; opacity: .7; margin: 13px 0 6px; }
+  input[type=text], input[type=url], select, textarea {
+    width: 100%; font-family: inherit; font-size: 15px; color: var(--navy);
+    padding: 10px 13px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--white);
+  }
+  textarea { resize: vertical; line-height: 1.55; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--sun); }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 7px; }
+  .chip {
+    font-family: inherit; font-size: 13.5px; padding: 7px 13px; border-radius: 999px;
+    border: 1.5px solid var(--line); background: var(--white); color: var(--navy); cursor: pointer;
+  }
+  .chip.on { background: var(--navy); border-color: var(--navy); color: var(--white); }
+  .seg { display: flex; gap: 8px; margin-bottom: 4px; }
+  .seg-btn {
+    flex: 1; font-family: 'Jua', sans-serif; font-size: 15px; padding: 11px;
+    border-radius: 12px; cursor: pointer; border: 1.5px solid var(--line);
+    background: var(--white); color: var(--navy);
+  }
+  .seg-btn.on { background: var(--navy); border-color: var(--navy); color: var(--white); }
+  .btn {
+    font-family: 'Jua', sans-serif; font-size: 15px; border: none; border-radius: 12px;
+    padding: 11px 20px; cursor: pointer;
+  }
+  .btn-primary { background: var(--sun); color: var(--navy); }
+  .btn-ghost { background: var(--sky); color: var(--navy); }
+  .btn-danger { background: #FDEDEA; color: #C94F3D; }
+  .btn:disabled { opacity: .5; cursor: default; }
+  .btn-row { display: flex; gap: 10px; margin-top: 20px; }
+  .mini { font-size: 13px; padding: 7px 12px; border-radius: 10px; }
+  .msg { font-size: 14px; margin-top: 12px; display: none; }
+  .msg.ok { color: #1F8A70; display: block; }
+  .msg.bad { color: var(--coral); display: block; }
+  .thumb-preview {
+    width: 110px; aspect-ratio: 4/3; border-radius: 10px; object-fit: cover;
+    border: 1.5px solid var(--line); display: none; margin-top: 8px;
+  }
+  .sticky-note { font-size: 12.5px; opacity: .55; margin-top: 10px; line-height: 1.5; }
+
+  /* 오른쪽 보드 */
+  .board-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+  .board-head select { width: auto; min-width: 140px; }
+  .save-sel { margin-left: auto; background: var(--mint); color: var(--navy); }
+  .save-sel.dirty { background: var(--coral); color: var(--white); }
+  .filters { border-top: 1px dashed var(--line); margin-top: 12px; padding-top: 4px; }
+  .f-row { display: flex; gap: 8px; align-items: baseline; margin: 8px 0; flex-wrap: wrap; }
+  .f-label { font-size: 12.5px; opacity: .55; width: 58px; flex-shrink: 0; }
+  .item { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .item:last-child { border-bottom: none; }
+  .item input[type=checkbox] { width: 22px; height: 22px; accent-color: var(--navy); flex-shrink: 0; cursor: pointer; }
+  .item img, .item .ph {
+    width: 72px; aspect-ratio: 4/3; border-radius: 10px; object-fit: cover; flex-shrink: 0; background: var(--sky);
+  }
+  .item .ph { display: flex; align-items: center; justify-content: center; font-family: 'Jua', sans-serif; font-size: 24px; color: var(--white); }
+  .item-info { flex: 1; min-width: 0; }
+  .item-title { font-family: 'Jua', sans-serif; font-size: 15.5px; display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+  .cat { font-size: 11px; padding: 2px 8px; border-radius: 999px; }
+  .cat.play { background: var(--sky); }
+  .cat.work { background: #FFF1D6; }
+  .vis { font-size: 11px; padding: 2px 8px; border-radius: 999px; }
+  .vis.private { background: #EEF2F7; }
+  .vis.pending { background: #FFF1D6; }
+  .vis.public { background: #E3F7EF; color: #1F8A70; }
+  .item-meta { font-size: 12px; opacity: .6; margin-top: 3px; line-height: 1.5; }
+  .review-note { width: 100%; font-size: 12.5px; background: #FFF6F4; color: #C94F3D; border-radius: 10px; padding: 8px 12px; }
+  .t-link { cursor: pointer; }
+  .t-link:hover { text-decoration: underline; }
+  .empty { opacity: .5; font-size: 14px; padding: 16px 0; }
+  .count { opacity: .5; font-size: 14px; }
+
+  /* 모달 공통 */
+  .modal {
+    position: fixed; inset: 0; background: rgba(30,58,95,.45); display: none;
+    align-items: center; justify-content: center; z-index: 50; padding: 20px;
+  }
+  .modal.open { display: flex; }
+  .sheet {
+    background: var(--white); border-radius: 22px; padding: 28px; width: 100%; max-width: 460px;
+    max-height: 88vh; overflow-y: auto;
+  }
+  .sheet h3 { font-family: 'Jua', sans-serif; font-weight: 400; font-size: 20px; margin-bottom: 14px; }
+  .qr-box { display: flex; justify-content: center; margin: 16px 0; }
+  .code-big {
+    font-family: 'Jua', sans-serif; font-size: 26px; text-align: center; letter-spacing: 2px;
+    background: var(--sky); border-radius: 14px; padding: 12px; margin: 10px 0;
+  }
+  .pass-row { display: flex; justify-content: space-between; font-size: 13.5px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .pass-row:last-child { border-bottom: none; }
+  .pass-days { font-weight: 700; color: #1F8A70; }
+</style>
+<link rel="stylesheet" href="css/pop.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <h1>놀이<span class="pop">팝</span> · 교사 관리</h1>
+    <span class="lv-badge" id="lvBadge"></span>
+    <span class="plus-tag" id="plusTag"></span>
+    <div class="top-right">
+      <a class="btn btn-ghost mini" href="library.html" style="text-decoration:none">🍿 공유 라이브러리</a>
+      <button class="btn btn-ghost mini" id="passBtn">👤 마이페이지</button>
+      <button class="btn btn-ghost mini" id="logoutBtn">로그아웃</button>
+    </div>
+  </div>
+
+  <div class="cols">
+    <!-- ════ 왼쪽: 등록 ════ -->
+    <div class="panel">
+      <h2 id="formTitle">새 놀이 등록</h2>
+
+      <div class="big-tabs" id="catSeg">
+        <button type="button" class="big-tab on" data-cat="놀이">🎠 놀이 등록</button>
+        <button type="button" class="big-tab" data-cat="업무">📋 업무 등록</button>
+      </div>
+      <p class="sticky-note" id="catNote">놀이는 유아 태블릿에 노출되고, 업무는 나만 볼 수 있어요.</p>
+
+      <label for="fTitle">이름</label>
+      <input type="text" id="fTitle" placeholder="예: 한글 단어 미로 게임">
+
+      <label for="fUrl">링크 (URL)</label>
+      <input type="url" id="fUrl" placeholder="https://…">
+
+      <div id="playOnly">
+        <div class="grp grp-age">
+          <label>🎈 연령 <span class="req">*필수</span></label>
+          <div class="chip-grid" id="fAges"></div>
+        </div>
+        <div class="grp grp-theme">
+          <label>🌈 놀이 주제 <span class="req">*필수</span></label>
+          <div class="chip-grid" id="fThemes"></div>
+        </div>
+        <div class="grp grp-type">
+          <label>🎠 활동 유형 <span class="req">*필수</span></label>
+          <div class="chip-grid" id="fTypes"></div>
+        </div>
+        <div class="grp grp-dev">
+          <label>📱 구현 기기 <span class="opt">권장 · 여러 개 가능</span></label>
+          <div class="chip-grid" id="fDevices"></div>
+        </div>
+        <div class="grp grp-comp">
+          <label>🌟 유아 디지털 역량 <span class="opt">권장</span> <a href="#" id="compGuideLink" style="font-size:12px; color:inherit; opacity:.7; margin-left:6px">ⓘ 역량이 뭐예요?</a></label>
+          <div class="chip-grid" id="fComps"></div>
+        </div>
+        <div class="grp grp-ai">
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer">
+            <input type="checkbox" id="fIsAi" style="width:17px; height:17px; accent-color:#3B57A9">
+            🤖 이 놀이는 AI를 활용해요 <span class="opt">음성인식·생성형 AI·스마트 스피커 등</span>
+            <a href="#" id="aiGuideLink" style="font-size:12px; color:inherit; opacity:.7; margin-left:auto">ⓘ AI 리터러시?</a>
+          </label>
+          <div id="aiElemBox" style="display:none; margin-top:8px">
+            <div class="chip-grid" id="fAiElems"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="workOnly" style="display:none">
+        <div class="grp grp-work">
+          <label>📁 자료 분류 <span class="opt">하나만 선택</span></label>
+          <div class="chip-grid" id="fWorkCat"></div>
+        </div>
+      </div>
+
+      <div class="row2">
+        <div>
+          <label for="fSource">출처</label>
+          <select id="fSource">
+            <option value="자체개발">⭐ 자체개발</option>
+            <option value="퍼옴">🔗 퍼옴</option>
+          </select>
+        </div>
+        <div>
+          <label for="fVis">공개범위</label>
+          <select id="fVis">
+            <option value="private">🔒 나만 쓰기</option>
+            <option value="pending">🌍 전체 공개 신청</option>
+          </select>
+        </div>
+      </div>
+      <p class="sticky-note" id="visNote"></p>
+
+      <label for="fDesc">사용안내 · 놀이방법 <span id="descReq">(놀이는 필수)</span>
+        <button type="button" class="btn btn-ghost mini" id="descTplBtn" style="margin-left:8px">📋 양식 불러오기</button>
+      </label>
+      <textarea id="fDesc" rows="6"></textarea>
+
+      <label for="fThumb">썸네일 이미지 (선택)</label>
+      <input type="file" id="fThumb" accept="image/*">
+      <img class="thumb-preview" id="thumbPreview" alt="썸네일 미리보기">
+
+      <div class="msg" id="formMsg"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="resetBtn">비우기</button>
+        <button class="btn btn-primary" id="saveBtn" style="flex:1">등록하기</button>
+      </div>
+    </div>
+
+    <!-- ════ 오른쪽: 내 놀이 + 반별 선택 ════ -->
+    <div class="panel">
+      <div class="board-head">
+        <h2 style="margin:0">내 놀이 <span class="count" id="count"></span></h2>
+        <select id="classSelect"><option value="">반 선택…</option></select>
+        <button type="button" class="btn btn-ghost mini" id="addClassBtn">+ 반 추가</button>
+        <button type="button" class="btn btn-ghost mini" id="classInfoBtn" disabled>📱 태블릿 연결</button>
+        <button type="button" class="btn mini save-sel" id="saveSelBtn" disabled>선택 저장</button>
+      </div>
+      <p class="sticky-note">반을 선택하면 체크박스가 나타나요. 체크한 놀이만 그 반 태블릿에 보여요.</p>
+
+      <details class="pop-fold">
+      <summary>🔍 필터 열기</summary>
+      <div class="filters" style="border:none; margin-top:6px; padding-top:0">
+        <div class="grp"><label>대분류</label><div class="chip-grid" id="filterCat"></div></div>
+        <div class="grp grp-theme pf"><label>🌈 놀이 주제</label><div class="chip-grid" id="filterTheme"></div></div>
+        <div class="grp grp-type pf"><label>🎠 활동 유형</label><div class="chip-grid" id="filterType"></div></div>
+        <div class="grp grp-age pf"><label>🎈 연령</label><div class="chip-grid" id="filterAge"></div></div>
+        <div class="grp grp-dev pf"><label>📱 구현 기기</label><div class="chip-grid" id="filterDevice"></div></div>
+        <div class="grp grp-comp pf"><label>🌟 디지털 역량</label><div class="chip-grid" id="filterComp"></div></div>
+        <div class="grp grp-work wf" style="display:none"><label>📁 자료 분류</label><div class="chip-grid" id="filterWorkCatMy"></div></div>
+        <div class="grp"><label>🔓 공개범위</label><div class="chip-grid" id="filterVis"></div></div>
+      </div>
+      </details>
+
+      <div id="list"></div>
+
+      <!-- 공유 라이브러리에서 담아온 남의 놀이 (반 선택 시 표시) -->
+      <div id="savedSection" style="display:none; border-top: 1px dashed var(--line); margin-top: 14px; padding-top: 14px;">
+        <h2 style="font-size:16px">🍿 담아온 놀이 <span class="count" id="savedCount"></span></h2>
+        <p class="sticky-note">공유 라이브러리에서 이 반에 담은 놀이예요. 태블릿에 함께 보여요.</p>
+        <div id="savedList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 태블릿 연결 모달 (QR + 반 코드) -->
+<div class="modal" id="classModal">
+  <div class="sheet">
+    <h3 id="cmTitle">📱 태블릿 연결</h3>
+    <p style="font-size:13.5px; line-height:1.7; opacity:.75">
+      방법 ① 태블릿 카메라로 아래 <b>QR을 찍으면</b> 바로 열려요.<br>
+      방법 ② 태블릿에서 놀이팝 유아 화면을 열고 <b>반 코드</b>를 입력해요.<br>
+      열린 뒤 "홈 화면에 추가"를 하면 앱처럼 쓸 수 있어요.
+    </p>
+    <div class="qr-box" id="qrBox"></div>
+    <div class="code-big" id="cmCode"></div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="cmCopy" style="flex:1">주소 복사</button>
+      <button class="btn btn-primary" id="cmClose" style="flex:1">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 유아 디지털 역량 안내 모달 -->
+<div class="modal" id="compGuideModal">
+  <div class="sheet" style="max-width:500px">
+    <h3 id="compGuideTitle">🍿 유아 디지털 역량 6가지</h3>
+    <p id="compGuideDesc" style="font-size:13px; opacity:.65; margin-bottom:6px"></p>
+    <div id="compGuideList"></div>
+    <p id="compGuideSource" style="font-size:11.5px; opacity:.5; margin-top:12px; line-height:1.6"></p>
+    <div class="btn-row"><button class="btn btn-primary" id="compGuideClose" style="flex:1">확인</button></div>
+  </div>
+</div>
+
+<!-- 마이페이지 모달 -->
+<div class="modal" id="passModal">
+  <div class="sheet">
+    <h3>👤 마이페이지</h3>
+    <div class="code-big" id="pmStatus"></div>
+    <div style="text-align:center; font-size:13.5px; opacity:.75; margin:-4px 0 8px" id="pmLevel"></div>
+
+    <label for="pmNick">닉네임</label>
+    <div style="display:flex; gap:8px">
+      <input type="text" id="pmNick" maxlength="12" style="flex:1">
+      <button class="btn btn-ghost mini" id="pmNickSave">변경</button>
+    </div>
+    <div class="msg" id="pmNickMsg"></div>
+
+    <label for="pmCode">이용권 코드 입력</label>
+    <div style="display:flex; gap:8px">
+      <input type="text" id="pmCode" placeholder="POP-XXXX-XXXX" style="flex:1">
+      <button class="btn btn-primary mini" id="pmRedeem">등록</button>
+    </div>
+    <div class="msg" id="pmMsg"></div>
+
+    <h3 style="margin-top:20px">적립 내역</h3>
+    <div id="pmEvents"></div>
+
+    <h3 style="margin-top:20px">✉️ 관리자에게 요청</h3>
+    <textarea id="reqContent" rows="2" placeholder="예: '전통놀이' 주제를 추가해 주세요"></textarea>
+    <div class="msg" id="reqMsg"></div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="reqSend" style="flex:1">요청 보내기</button>
+      <button class="btn btn-primary" id="pmClose" style="flex:1">닫기</button>
+    </div>
+    <p style="text-align:center; margin-top:16px">
+      <button id="withdrawBtn" style="background:none; border:none; font-size:12px; color:#C94F3D; opacity:.6; cursor:pointer; text-decoration:underline">회원 탈퇴</button>
+    </p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/common.js"></script>
+<script>
+const PALETTE = ['#6ED3BF', '#FFC93C', '#FF7B6B', '#8FB8F6', '#C9A0F0'];
+
+let me = null;            // 내 프로필
+let settings = {};        // app_settings
+let plays = [];           // 내 놀이·업무
+let classes = [];         // 내 반 목록
+let curClass = '';        // 선택된 반 id
+let checked = new Set();  // 현재 반에 체크된 놀이 id
+let dirty = false;
+let editingId = null;
+let thumbBlob = null;     // 업로드할 썸네일 (리사이즈된 JPEG)
+let curCat = '놀이';
+let filters = { cat: '전체', theme: '전체', type: '전체', age: '전체', device: '전체', comp: '전체', workCat: '전체', vis: '전체' };
+const VIS_LABEL = { private: '🔒 나만', pending: '⏳ 검수중', public: '🌍 공개' };
+
+/* ───── 초기화 ───── */
+(async () => {
+  const session = await requireAuth();
+  if (!session) return;
+  // 로딩 중엔 스켈레톤 표시
+  document.getElementById('list').innerHTML = '<div class="skel skel-row"></div>'.repeat(3);
+  try {
+    settings = await loadSettings();
+    await checkIn(); // 출석 1점/일 — 프로필을 읽기 전에 적립해야 점수가 바로 보여요
+    me = await loadMyProfile(session.user.id);
+    renderTopbar();
+    buildFormChips();
+    buildWorkChips();
+    buildAiChips();
+    buildFilters();
+    setCat('놀이');
+    updateVisNote();
+    document.getElementById('fDesc').value = descTemplate(); // 첫 화면부터 양식 채워두기
+    await Promise.all([loadPlays(), loadClasses()]);
+    renderList();
+  } catch (e) {
+    alert('데이터를 불러오지 못했어요. config.js의 Supabase 설정을 확인해 주세요.\n' + (e.message || e));
+  }
+})();
+
+function renderTopbar() {
+  const lv = levelOf(me.points, settings.level_thresholds);
+  document.getElementById('lvBadge').innerHTML = `${lv.emoji || '🍿'} ${esc(lv.name)} · ${me.points}점`;
+  // 관리자에게만 운영자 페이지 버튼 표시
+  if (me.role === 'admin' && !document.getElementById('adminLink')) {
+    const a = document.createElement('a');
+    a.id = 'adminLink'; a.className = 'btn btn-ghost mini'; a.href = 'admin.html';
+    a.style.textDecoration = 'none'; a.textContent = '⚙️ 운영자';
+    document.querySelector('.top-right').prepend(a);
+  }
+  const plus = isPlusDate(me.plus_expires_at);
+  document.getElementById('plusTag').textContent = plus
+    ? `플러스 ~${fmtDate(me.plus_expires_at)}`
+    : '무료 회원';
+}
+
+/* ───── 데이터 로드 ───── */
+async function loadPlays() {
+  const { data, error } = await sb.from('plays').select('*')
+    .eq('owner_id', me.id).order('created_at', { ascending: false });
+  if (error) throw error;
+  plays = data || [];
+  document.getElementById('count').textContent = `${plays.length}개`;
+}
+
+async function loadClasses() {
+  const { data, error } = await sb.from('classes').select('*')
+    .eq('owner_id', me.id).order('created_at');
+  if (error) throw error;
+  classes = data || [];
+  const sel = document.getElementById('classSelect');
+  const keep = curClass;
+  sel.innerHTML = '<option value="">반 선택…</option>';
+  classes.forEach(c => {
+    const o = document.createElement('option');
+    o.value = c.id; o.textContent = c.name;
+    sel.appendChild(o);
+  });
+  if (keep && classes.some(c => c.id === keep)) sel.value = keep;
+}
+
+async function loadChecked(classId) {
+  const { data, error } = await sb.from('class_plays').select('play_id').eq('class_id', classId);
+  if (error) throw error;
+  checked = new Set((data || []).map(r => r.play_id));
+  await loadSavedPlays(classId);
+}
+
+/* 공유 라이브러리에서 담아온 남의 놀이 */
+let savedPlays = [];
+async function loadSavedPlays(classId) {
+  const { data } = await sb.from('class_plays').select('play_id, plays(*)').eq('class_id', classId);
+  savedPlays = (data || []).map(r => r.plays).filter(p => p && p.owner_id !== me.id);
+  renderSaved();
+}
+function renderSaved() {
+  const sec = document.getElementById('savedSection');
+  const box = document.getElementById('savedList');
+  if (!curClass) { sec.style.display = 'none'; return; }
+  sec.style.display = 'block';
+  document.getElementById('savedCount').textContent = `${savedPlays.length}개`;
+  box.innerHTML = savedPlays.length ? '' : '<p class="empty">아직 담아온 놀이가 없어요. 공유 라이브러리를 구경해 보세요!</p>';
+  savedPlays.forEach((l, i) => {
+    const div = document.createElement('div');
+    div.className = 'item';
+    const thumb = l.thumb_url
+      ? `<img src="${esc(l.thumb_url)}" alt="">`
+      : `<div class="ph" style="background:${PALETTE[i % PALETTE.length]}">${esc(l.title.charAt(0))}</div>`;
+    div.innerHTML = `<span style="width:22px;flex-shrink:0"></span>${thumb}
+      <div class="item-info">
+        <div class="item-title"><span class="t-link" data-prev>${esc(l.title)} ↗</span></div>
+        <div class="item-meta">${(l.ages || []).map(a => a + '세').join('·')}${l.editor_pick ? '　|　🏅 에디터 픽' : ''}</div>
+      </div>
+      <button class="btn btn-danger mini" data-rm>반에서 빼기</button>`;
+    div.querySelector('[data-prev]').addEventListener('click', () => window.open(l.url, '_blank', 'noopener,width=1100,height=750'));
+    div.querySelector('[data-rm]').addEventListener('click', async () => {
+      const { error } = await sb.rpc('remove_from_class', { p_play: l.id, p_class: curClass });
+      if (error) return alert('실패: ' + error.message);
+      await loadSavedPlays(curClass);
+    });
+    box.appendChild(div);
+  });
+}
+
+/* ───── 등록 폼 ───── */
+function setCat(cat) {
+  curCat = cat;
+  document.querySelectorAll('#catSeg .big-tab').forEach(b => b.classList.toggle('on', b.dataset.cat === cat));
+  document.getElementById('playOnly').style.display = cat === '놀이' ? 'block' : 'none';
+  document.getElementById('workOnly').style.display = cat === '업무' ? 'block' : 'none';
+  document.getElementById('catNote').textContent = cat === '놀이'
+    ? '놀이는 유아 태블릿에 노출돼요. 반별 선택에서 체크하면 그 반에 보여요.'
+    : '업무 링크는 유아 화면에 나가지 않아요.';
+  document.getElementById('descReq').textContent = cat === '놀이' ? '(필수)' : '(선택)';
+  // 탭 전환 시: 비어 있거나 반대쪽 양식 그대로면 현재 탭의 양식으로 교체
+  if (!editingId) {
+    const box = document.getElementById('fDesc');
+    const tpl놀이 = String(settings.desc_template || '');
+    const tpl업무 = String(settings.desc_template_work || '');
+    if (!box.value.trim() || box.value === tpl놀이 || box.value === tpl업무) box.value = descTemplate();
+  }
+  if (!editingId) document.getElementById('formTitle').textContent = cat === '놀이' ? '새 놀이 등록' : '새 업무 링크 등록';
+}
+document.querySelectorAll('#catSeg .big-tab').forEach(b => b.addEventListener('click', () => {
+  setCat(b.dataset.cat);
+  filters.cat = b.dataset.cat;
+  buildFilterRow('filterCat', 'cat', ['놀이', '업무']);
+  renderList();
+}));
+
+function makeChip(label, on, value) {
+  const c = document.createElement('button');
+  c.type = 'button'; c.className = 'chip' + (on ? ' on' : '');
+  c.textContent = label; c.dataset.value = value;
+  c.addEventListener('click', () => c.classList.toggle('on'));
+  return c;
+}
+
+function buildFormChips(selAges = [], selThemes = [], selTypes = [], selComps = [], selDevices = []) {
+  const aBox = document.getElementById('fAges');
+  const tBox = document.getElementById('fThemes');
+  const yBox = document.getElementById('fTypes');
+  const cBox = document.getElementById('fComps');
+  const dBox = document.getElementById('fDevices');
+  aBox.innerHTML = ''; tBox.innerHTML = ''; yBox.innerHTML = ''; cBox.innerHTML = ''; dBox.innerHTML = '';
+  (settings.devices || []).forEach(d => dBox.appendChild(makeChip(d, selDevices.includes(d), d)));
+  (settings.ages || []).forEach(a => aBox.appendChild(makeChip(a + '세', selAges.includes(a), a)));
+  (settings.themes || []).forEach(t => tBox.appendChild(makeChip(t, selThemes.includes(t), t)));
+  (settings.types || []).forEach(t => yBox.appendChild(makeChip(t, selTypes.includes(t), t)));
+  // 디지털 역량 칩 — 마우스를 올리면 쉬운 설명 (title 툴팁)
+  (settings.competencies || []).forEach(c => {
+    const chip = makeChip(`${c.emoji || ''} ${c.name}`, selComps.includes(c.name), c.name);
+    chip.title = `${c.full}\n${c.desc}\n예: ${c.ex}`;
+    cBox.appendChild(chip);
+  });
+}
+
+/* AI 리터러시 5요소 칩 (AI 활용 체크 시에만 표시) */
+function buildAiChips(selElems = [], isAi = false) {
+  const box = document.getElementById('fAiElems');
+  box.innerHTML = '';
+  (settings.ai_elements || []).forEach(e => {
+    const chip = makeChip(`${e.emoji || ''} ${e.name}`, selElems.includes(e.name), e.name);
+    chip.title = `${e.en}\n${e.desc}\n예: ${e.ex}`;
+    box.appendChild(chip);
+  });
+  document.getElementById('fIsAi').checked = isAi;
+  document.getElementById('aiElemBox').style.display = isAi ? 'block' : 'none';
+}
+document.getElementById('fIsAi').addEventListener('change', e => {
+  document.getElementById('aiElemBox').style.display = e.target.checked ? 'block' : 'none';
+});
+
+/* AI 리터러시 안내 팝업 */
+document.getElementById('aiGuideLink').addEventListener('click', e => {
+  e.preventDefault();
+  const box = document.getElementById('compGuideList');
+  box.innerHTML = (settings.ai_elements || []).map(c => `
+    <div style="padding:11px 0; border-bottom:1px solid var(--line)">
+      <div style="font-size:14.5px; font-weight:600">${c.emoji || ''} ${esc(c.name)}
+        <span style="font-size:12px; font-weight:400; opacity:.5; margin-left:4px">${esc(c.en || '')}</span></div>
+      <div style="font-size:13.5px; opacity:.8; margin-top:4px; line-height:1.7; word-break:keep-all">${esc(c.detail || c.desc || '')}</div>
+      <div style="font-size:12.5px; margin-top:5px; background:var(--sky); border-radius:8px; padding:6px 10px; line-height:1.6; word-break:keep-all">💡 예: ${esc(c.ex || '')}</div>
+    </div>`).join('');
+  document.getElementById('compGuideTitle').textContent = '🤖 유아 AI 리터러시 5요소';
+  document.getElementById('compGuideDesc').textContent = 'AI를 활용하는 놀이라면 어떤 리터러시 요소를 기르는지 태그해 주세요. 다른 선생님들이 목적에 맞게 찾을 수 있어요!';
+  document.getElementById('compGuideSource').textContent = '출처: OECD·유네스코 AI 역량 체계 기반 유아 AI 교육 자료(2026 교육부 디지털 선도교원 워크숍 전달연수)를 쉽게 풀어 쓴 것';
+  document.getElementById('compGuideModal').classList.add('open');
+});
+
+/* 업무 자료 분류 칩 — 하나만 선택 */
+function buildWorkChips(selected = '') {
+  const box = document.getElementById('fWorkCat');
+  box.innerHTML = '';
+  (settings.work_categories || []).forEach(w => {
+    const chip = makeChip(w, w === selected, w);
+    chip.addEventListener('click', () => {
+      // 하나만 선택되도록 나머지 해제 (makeChip의 기본 토글 뒤에 실행됨)
+      box.querySelectorAll('.chip').forEach(x => { if (x !== chip) x.classList.remove('on'); });
+    });
+    box.appendChild(chip);
+  });
+}
+
+/* 사용안내 양식 불러오기 — 새 등록 때는 자동으로 채워짐 (놀이/업무 양식이 달라요) */
+function descTemplate() {
+  return String((curCat === '업무' ? settings.desc_template_work : settings.desc_template) || '');
+}
+document.getElementById('descTplBtn').addEventListener('click', () => {
+  const box = document.getElementById('fDesc');
+  if (box.value.trim() && !confirm('지금 쓴 내용을 지우고 양식으로 바꿀까요?')) return;
+  box.value = descTemplate();
+  box.focus();
+});
+
+/* 역량 안내 팝업 (모르는 선생님을 위한 한눈 설명) */
+document.getElementById('compGuideLink').addEventListener('click', e => {
+  e.preventDefault();
+  const box = document.getElementById('compGuideList');
+  box.innerHTML = (settings.competencies || []).map(c => `
+    <div style="padding:11px 0; border-bottom:1px solid var(--line)">
+      <div style="font-size:14.5px; font-weight:600">${c.emoji || ''} ${esc(c.name)}
+        <span style="font-size:12px; font-weight:400; opacity:.5; margin-left:4px">${esc(c.full || '')}</span></div>
+      <div style="font-size:13.5px; opacity:.8; margin-top:4px; line-height:1.7; word-break:keep-all">
+        ${esc(c.detail || c.desc || '')}</div>
+      <div style="font-size:12.5px; margin-top:5px; background:var(--sky); border-radius:8px; padding:6px 10px; line-height:1.6; word-break:keep-all">
+        💡 예: ${esc(c.ex || '')}</div>
+    </div>`).join('') || '<p class="empty">역량 목록을 불러오지 못했어요. 관리자 설정을 확인해 주세요.</p>';
+  document.getElementById('compGuideTitle').textContent = '🍿 유아 디지털 역량 6가지';
+  document.getElementById('compGuideDesc').textContent = '놀이를 등록할 때 해당하는 역량을 골라두면, 다른 선생님들이 역량별로 놀이를 찾을 수 있어요!';
+  document.getElementById('compGuideSource').textContent = '출처: 교육부·경기도교육청, 「유아의 균형 있는 디지털 역량을 기르기 위한 교육 자료」(현장지원자료)의 6개 하위 영역을 쉽게 풀어 쓴 것';
+  document.getElementById('compGuideModal').classList.add('open');
+});
+document.getElementById('compGuideClose').addEventListener('click', () =>
+  document.getElementById('compGuideModal').classList.remove('open'));
+
+/* 출처·공개범위 안내문 (퍼옴은 공개 불가, 공개 신청은 플러스만) */
+function updateVisNote() {
+  const src = document.getElementById('fSource').value;
+  const visSel = document.getElementById('fVis');
+  const note = document.getElementById('visNote');
+  const plus = isPlusDate(me?.plus_expires_at);
+  if (src === '퍼옴') {
+    visSel.value = 'private'; visSel.disabled = true;
+    note.textContent = '퍼온 링크는 저작권 때문에 "나만 쓰기"만 가능해요.';
+  } else if (!plus) {
+    visSel.value = 'private'; visSel.disabled = true;
+    note.textContent = '전체 공개 신청은 플러스 회원 기능이에요.';
+  } else {
+    visSel.disabled = false;
+    note.textContent = visSel.value === 'pending'
+      ? '검수 후 공유 라이브러리에 공개돼요. 승인되면 플러스 +2주 적립! 🍿'
+      : '';
+  }
+}
+document.getElementById('fSource').addEventListener('change', updateVisNote);
+document.getElementById('fVis').addEventListener('change', updateVisNote);
+
+/* 썸네일: 400px JPEG로 리사이즈 (기존 로직 계승) */
+document.getElementById('fThumb').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) { thumbBlob = null; return; }
+  const img = new Image();
+  const reader = new FileReader();
+  reader.onload = ev => { img.src = ev.target.result; };
+  img.onload = () => {
+    const scale = Math.min(1, 400 / img.width);
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(img.width * scale);
+    canvas.height = Math.round(img.height * scale);
+    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+    canvas.toBlob(b => { thumbBlob = b; }, 'image/jpeg', 0.82);
+    const prev = document.getElementById('thumbPreview');
+    prev.src = canvas.toDataURL('image/jpeg', 0.82); prev.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+});
+
+function resetForm() {
+  editingId = null; thumbBlob = null;
+  setCat('놀이');
+  document.getElementById('formTitle').textContent = '새 놀이 등록';
+  document.getElementById('saveBtn').textContent = '등록하기';
+  ['fTitle', 'fUrl'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fDesc').value = descTemplate(); // 새 등록은 양식이 미리 채워짐
+  document.getElementById('fSource').value = '자체개발';
+  document.getElementById('fVis').value = 'private';
+  document.getElementById('fThumb').value = '';
+  document.getElementById('thumbPreview').style.display = 'none';
+  buildFormChips();
+  buildWorkChips();
+  buildAiChips();
+  updateVisNote();
+  document.getElementById('formMsg').className = 'msg';
+}
+document.getElementById('resetBtn').addEventListener('click', resetForm);
+
+function startEdit(id) {
+  const l = plays.find(x => x.id === id);
+  if (!l) return;
+  editingId = id; thumbBlob = null;
+  setCat(l.category);
+  document.getElementById('formTitle').textContent = l.category === '업무' ? '업무 링크 수정' : '놀이 수정';
+  document.getElementById('saveBtn').textContent = '수정 저장';
+  document.getElementById('fTitle').value = l.title;
+  document.getElementById('fUrl').value = l.url;
+  document.getElementById('fDesc').value = l.description || '';
+  document.getElementById('fSource').value = l.source;
+  document.getElementById('fVis').value = l.visibility === 'public' ? 'pending' : l.visibility;
+  buildFormChips(l.ages || [], l.themes || [], l.types || [], l.competencies || [], l.devices || []);
+  buildWorkChips(l.work_category || '');
+  buildAiChips(l.ai_elements || [], !!l.is_ai);
+  updateVisNote();
+  if (l.visibility === 'public') document.getElementById('fVis').value = 'pending'; // 공개 상태는 유지, 저장 시 처리
+  if (l.thumb_url) {
+    const prev = document.getElementById('thumbPreview');
+    prev.src = l.thumb_url; prev.style.display = 'block';
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function save() {
+  const msg = document.getElementById('formMsg');
+  const btn = document.getElementById('saveBtn');
+  const title = document.getElementById('fTitle').value.trim();
+  const url = document.getElementById('fUrl').value.trim();
+  const ages = curCat === '놀이' ? [...document.querySelectorAll('#fAges .chip.on')].map(c => c.dataset.value) : [];
+  if (!title || !url) { msg.className = 'msg bad'; msg.textContent = '이름과 링크는 꼭 입력해 주세요.'; return; }
+  if (curCat === '놀이' && ages.length === 0) { msg.className = 'msg bad'; msg.textContent = '놀이는 연령을 하나 이상 선택해 주세요.'; return; }
+  // 주제·유형 필수 (라이브러리 검색 품질을 위해)
+  if (curCat === '놀이' && document.querySelectorAll('#fThemes .chip.on').length === 0) {
+    msg.className = 'msg bad'; msg.textContent = '놀이 주제를 하나 이상 선택해 주세요.'; return;
+  }
+  if (curCat === '놀이' && document.querySelectorAll('#fTypes .chip.on').length === 0) {
+    msg.className = 'msg bad'; msg.textContent = '활동 유형을 하나 이상 선택해 주세요.'; return;
+  }
+  // 놀이는 사용안내 필수 (다른 선생님이 바로 쓸 수 있게)
+  const descVal = document.getElementById('fDesc').value.trim();
+  if (curCat === '놀이' && !descVal) {
+    msg.className = 'msg bad';
+    msg.textContent = '사용안내를 입력해 주세요. "양식 불러오기"를 누르면 쉽게 쓸 수 있어요!';
+    return;
+  }
+
+  btn.disabled = true; btn.textContent = '저장 중…';
+  try {
+    // 썸네일 업로드 (본인 폴더에만 업로드 가능 — Storage 정책)
+    const prev = editingId ? plays.find(x => x.id === editingId) : null;
+    let thumbUrl = prev ? (prev.thumb_url || null) : null;
+    if (thumbBlob) {
+      const path = `${me.id}/thumb_${Date.now()}.jpg`;
+      const { error: upErr } = await sb.storage.from('thumbs').upload(path, thumbBlob, { contentType: 'image/jpeg' });
+      if (upErr) throw upErr;
+      thumbUrl = sb.storage.from('thumbs').getPublicUrl(path).data.publicUrl;
+    }
+
+    const visSel = document.getElementById('fVis').value;
+    const row = {
+      category: curCat, title, url, ages,
+      themes: curCat === '놀이' ? [...document.querySelectorAll('#fThemes .chip.on')].map(c => c.dataset.value) : [],
+      types: curCat === '놀이' ? [...document.querySelectorAll('#fTypes .chip.on')].map(c => c.dataset.value) : [],
+      competencies: curCat === '놀이' ? [...document.querySelectorAll('#fComps .chip.on')].map(c => c.dataset.value) : [],
+      devices: curCat === '놀이' ? [...document.querySelectorAll('#fDevices .chip.on')].map(c => c.dataset.value) : [],
+      work_category: curCat === '업무' ? (document.querySelector('#fWorkCat .chip.on')?.dataset.value || null) : null,
+      is_ai: curCat === '놀이' ? document.getElementById('fIsAi').checked : false,
+      ai_elements: (curCat === '놀이' && document.getElementById('fIsAi').checked)
+        ? [...document.querySelectorAll('#fAiElems .chip.on')].map(c => c.dataset.value) : [],
+      source: document.getElementById('fSource').value,
+      description: document.getElementById('fDesc').value.trim() || null,
+      thumb_url: thumbUrl
+    };
+
+    if (editingId) {
+      // 이미 공개(public)인 놀이는 공개범위를 건드리지 않음 (내리기는 목록의 버튼으로)
+      if (prev.visibility === 'private' && visSel === 'pending') row.visibility = 'pending';
+      if (prev.visibility === 'pending' && visSel === 'private') row.visibility = 'private';
+      const { error } = await sb.from('plays').update(row).eq('id', editingId);
+      if (error) throw error;
+      msg.textContent = '수정했어요.';
+    } else {
+      row.owner_id = me.id;
+      row.visibility = visSel;
+      const { error } = await sb.from('plays').insert(row);
+      if (error) throw error;
+      msg.textContent = visSel === 'pending'
+        ? '등록 완료! 검수가 끝나면 공유 라이브러리에 팝! 터져요 🍿'
+        : '등록했어요! 반별 선택에서 체크하면 태블릿에 보여요.';
+      me = await loadMyProfile(me.id); // 등록 점수 반영
+      renderTopbar();
+    }
+    msg.className = 'msg ok';
+    resetForm();
+    await loadPlays();
+    renderList();
+  } catch (e) {
+    msg.className = 'msg bad';
+    msg.textContent = '저장에 실패했어요: ' + (e.message || e);
+  }
+  btn.disabled = false; btn.textContent = editingId ? '수정 저장' : '등록하기';
+}
+document.getElementById('saveBtn').addEventListener('click', save);
+
+async function delPlay(id) {
+  const l = plays.find(x => x.id === id);
+  if (!confirm(`"${l ? l.title : ''}" 링크를 삭제할까요?\n반별 선택에서도 함께 빠집니다.`)) return;
+  const { error } = await sb.from('plays').delete().eq('id', id);
+  if (error) return alert('삭제 실패: ' + error.message);
+  checked.delete(id);
+  await loadPlays();
+  renderList();
+}
+
+/* 공개 내리기 (public/pending → private) */
+async function unpublish(id) {
+  if (!confirm('이 놀이를 "나만 쓰기"로 되돌릴까요?')) return;
+  const { error } = await sb.from('plays').update({ visibility: 'private' }).eq('id', id);
+  if (error) return alert('실패: ' + error.message);
+  await loadPlays();
+  renderList();
+}
+
+/* ───── 반 관리 ───── */
+document.getElementById('classSelect').addEventListener('change', async e => {
+  if (dirty && !confirm('저장하지 않은 선택이 있어요. 반을 바꾸면 사라집니다. 계속할까요?')) {
+    e.target.value = curClass; return;
+  }
+  curClass = e.target.value;
+  document.getElementById('classInfoBtn').disabled = !curClass;
+  if (curClass) await loadChecked(curClass);
+  else { checked = new Set(); savedPlays = []; renderSaved(); }
+  dirty = false;
+  updateSaveBtn();
+  renderList();
+});
+
+document.getElementById('addClassBtn').addEventListener('click', async () => {
+  const name = prompt('추가할 반 이름을 입력하세요 (예: 햇님반)');
+  if (!name || !name.trim()) return;
+  const { data, error } = await sb.from('classes').insert({ owner_id: me.id, name: name.trim() }).select().single();
+  if (error) return alert('반 추가 실패: ' + error.message);
+  await loadClasses();
+  document.getElementById('classSelect').value = data.id;
+  curClass = data.id;
+  document.getElementById('classInfoBtn').disabled = false;
+  checked = new Set(); dirty = false;
+  updateSaveBtn(); renderList();
+  openClassModal(); // 바로 태블릿 연결 안내
+});
+
+function updateSaveBtn() {
+  const btn = document.getElementById('saveSelBtn');
+  btn.disabled = !curClass;
+  btn.classList.toggle('dirty', dirty);
+  btn.textContent = curClass ? (dirty ? `선택 저장 (${checked.size}개)` : `저장됨 (${checked.size}개)`) : '선택 저장';
+}
+
+document.getElementById('saveSelBtn').addEventListener('click', async () => {
+  if (!curClass) return;
+  const btn = document.getElementById('saveSelBtn');
+  btn.disabled = true; btn.textContent = '저장 중…';
+  try {
+    // 내 놀이에 해당하는 행만 지우고 다시 넣기 (라이브러리에서 담아온 남의 놀이는 건드리지 않음)
+    const myIds = plays.map(p => p.id);
+    if (myIds.length > 0) {
+      const { error: dErr } = await sb.from('class_plays').delete()
+        .eq('class_id', curClass).in('play_id', myIds);
+      if (dErr) throw dErr;
+    }
+    const rows = [...checked].filter(id => myIds.includes(id))
+      .map(pid => ({ class_id: curClass, play_id: pid }));
+    if (rows.length > 0) {
+      const { error: iErr } = await sb.from('class_plays').insert(rows);
+      if (iErr) throw iErr;
+    }
+    dirty = false;
+  } catch (e) { alert('저장 실패: ' + (e.message || e)); }
+  btn.disabled = false;
+  updateSaveBtn();
+});
+
+/* 태블릿 연결 모달 (QR + 코드) */
+function openClassModal() {
+  const c = classes.find(x => x.id === curClass);
+  if (!c) return;
+  document.getElementById('cmTitle').textContent = `📱 ${c.name} 태블릿 연결`;
+  document.getElementById('cmCode').textContent = c.connect_code;
+  const url = new URL('tablet.html', location.href).href + '?c=' + c.tablet_token;
+  const box = document.getElementById('qrBox');
+  box.innerHTML = '';
+  new QRCode(box, { text: url, width: 180, height: 180, colorDark: '#1E3A5F' });
+  document.getElementById('cmCopy').onclick = async () => {
+    try { await navigator.clipboard.writeText(url); document.getElementById('cmCopy').textContent = '복사됨!'; }
+    catch (e) { prompt('아래 주소를 복사하세요:', url); }
+    setTimeout(() => document.getElementById('cmCopy').textContent = '주소 복사', 1500);
+  };
+  document.getElementById('classModal').classList.add('open');
+}
+document.getElementById('classInfoBtn').addEventListener('click', openClassModal);
+document.getElementById('cmClose').addEventListener('click', () => document.getElementById('classModal').classList.remove('open'));
+
+/* ───── 필터 ───── */
+function buildFilters() {
+  buildFilterRow('filterCat', 'cat', ['놀이', '업무']);
+  buildFilterRow('filterTheme', 'theme', settings.themes || []);
+  buildFilterRow('filterType', 'type', settings.types || []);
+  buildFilterRow('filterAge', 'age', (settings.ages || []).map(a => a + '세'));
+  buildFilterRow('filterDevice', 'device', settings.devices || []);
+  buildFilterRow('filterComp', 'comp', (settings.competencies || []).map(c => c.name));
+  buildFilterRow('filterWorkCatMy', 'workCat', settings.work_categories || []);
+  buildFilterRow('filterVis', 'vis', ['나만', '검수중', '공개']);
+}
+function buildFilterRow(boxId, key, options) {
+  const box = document.getElementById(boxId);
+  box.innerHTML = '';
+  ['전체', ...options].forEach(opt => {
+    const c = document.createElement('button');
+    c.type = 'button';
+    c.className = 'chip' + (filters[key] === opt ? ' on' : '');
+    c.textContent = opt;
+    c.addEventListener('click', () => { filters[key] = opt; buildFilterRow(boxId, key, options); renderList(); });
+    box.appendChild(c);
+  });
+}
+
+/* ───── 목록 ───── */
+const VIS_FILTER = { '나만': 'private', '검수중': 'pending', '공개': 'public' };
+function renderList() {
+  const box = document.getElementById('list');
+  // 대분류에 따라 필터 그룹 전환 (놀이 전용 ↔ 자료 분류)
+  const isWork = filters.cat === '업무';
+  document.querySelectorAll('.pf').forEach(el => el.style.display = isWork ? 'none' : 'block');
+  document.querySelectorAll('.wf').forEach(el => el.style.display = isWork ? 'block' : 'none');
+
+  const shown = plays.filter(l => {
+    if (filters.cat !== '전체' && l.category !== filters.cat) return false;
+    if (filters.vis !== '전체' && l.visibility !== VIS_FILTER[filters.vis]) return false;
+    if (isWork) {
+      // 업무는 자료 분류만 적용
+      return filters.workCat === '전체' || l.work_category === filters.workCat;
+    }
+    if (filters.theme !== '전체' && !(l.themes || []).includes(filters.theme)) return false;
+    if (filters.type !== '전체' && !(l.types || []).includes(filters.type)) return false;
+    if (filters.age !== '전체' && !(l.ages || []).includes(filters.age.replace('세', ''))) return false;
+    if (filters.device !== '전체' && !(l.devices || []).includes(filters.device)) return false;
+    if (filters.comp !== '전체' && !(l.competencies || []).includes(filters.comp)) return false;
+    return true;
+  });
+  document.getElementById('count').textContent = `${shown.length} / ${plays.length}개`;
+  box.innerHTML = shown.length ? '' : '<p class="empty">조건에 맞는 링크가 없어요.</p>';
+
+  shown.forEach((l, i) => {
+    const div = document.createElement('div');
+    div.className = 'item';
+    const canCheck = curClass && l.category === '놀이';
+    const checkbox = canCheck
+      ? `<input type="checkbox" data-check="${l.id}" ${checked.has(l.id) ? 'checked' : ''} aria-label="${esc(l.title)} 노출 선택">`
+      : '<span style="width:22px;flex-shrink:0"></span>';
+    const thumb = l.thumb_url
+      ? `<img src="${esc(l.thumb_url)}" alt="">`
+      : `<div class="ph" style="background:${PALETTE[i % PALETTE.length]}">${esc(l.title.charAt(0))}</div>`;
+    const meta = [
+      l.is_ai ? '🤖 AI 활용' : '',
+      l.work_category ? '📁 ' + l.work_category : '',
+      (l.ages || []).map(a => a + '세').join('·'),
+      (l.devices || []).join('·'),
+      (l.themes || []).join(', '),
+      (l.competencies || []).map(n => {
+        const c = (settings.competencies || []).find(x => x.name === n);
+        return (c?.emoji || '') + n;
+      }).join(', '),
+      (l.source === '자체개발' ? '⭐ 자체개발' : '🔗 퍼옴'),
+      l.editor_pick ? '🏅 에디터 픽' : '',
+      l.save_count > 0 ? `🍿 담김 ${l.save_count}` : ''
+    ].filter(Boolean).join('　|　');
+    const reviewNote = (l.visibility === 'private' && l.review_note)
+      ? `<div class="review-note">📝 수정 안내: ${esc(l.review_note)}</div>` : '';
+    const unpubBtn = (l.visibility !== 'private')
+      ? `<button class="btn btn-ghost mini" data-unpub="${l.id}">공개 내리기</button>` : '';
+    div.innerHTML = `${checkbox}${thumb}
+      <div class="item-info">
+        <div class="item-title">
+          <span class="cat ${l.category === '놀이' ? 'play' : 'work'}">${l.category}</span>
+          <span class="vis ${l.visibility}">${VIS_LABEL[l.visibility]}</span>
+          <span class="t-link" data-prev title="새 창에서 미리보기">${esc(l.title)} ↗</span>
+        </div>
+        <div class="item-meta">${meta}</div>
+      </div>
+      ${unpubBtn}
+      <button class="btn btn-ghost mini" data-edit="${l.id}">수정</button>
+      <button class="btn btn-danger mini" data-del="${l.id}">삭제</button>
+      ${reviewNote}`;
+    div.querySelector('[data-prev]').addEventListener('click', () => window.open(l.url, '_blank', 'noopener,width=1100,height=750'));
+    box.appendChild(div);
+  });
+
+  box.querySelectorAll('[data-check]').forEach(cb => cb.addEventListener('change', () => {
+    if (cb.checked) checked.add(cb.dataset.check); else checked.delete(cb.dataset.check);
+    dirty = true; updateSaveBtn();
+  }));
+  box.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => startEdit(b.dataset.edit)));
+  box.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => delPlay(b.dataset.del)));
+  box.querySelectorAll('[data-unpub]').forEach(b => b.addEventListener('click', () => unpublish(b.dataset.unpub)));
+}
+
+/* ───── 이용권·적립 모달 ───── */
+const KIND_LABEL = { founding: '🎉 오픈 멤버 증정', contribute: '🍿 공개 놀이 적립', editor_pick: '🏅 에디터 픽', code: '🎟️ 이용권 코드', admin: '⚙️ 관리자 조정' };
+document.getElementById('passBtn').addEventListener('click', async () => {
+  const plus = isPlusDate(me.plus_expires_at);
+  document.getElementById('pmStatus').textContent = plus
+    ? `플러스 · ${fmtDate(me.plus_expires_at)}까지`
+    : '무료 회원';
+  const lv = levelOf(me.points, settings.level_thresholds);
+  document.getElementById('pmLevel').textContent = `${lv.emoji || '🍿'} ${lv.name} · ${me.points}점 · 가입일 ${fmtDate(me.created_at)}`;
+  document.getElementById('pmNick').value = me.nickname;
+  const { data } = await sb.from('pass_events').select('*').eq('user_id', me.id).order('created_at', { ascending: false });
+  const box = document.getElementById('pmEvents');
+  box.innerHTML = (data && data.length)
+    ? data.map(ev => `<div class="pass-row"><span>${KIND_LABEL[ev.kind] || ev.kind} <span style="opacity:.5;font-size:12px">${fmtDate(ev.created_at)}</span></span><span class="pass-days">+${ev.days}일</span></div>`).join('')
+    : '<p class="empty">아직 내역이 없어요.</p>';
+  document.getElementById('passModal').classList.add('open');
+});
+document.getElementById('pmClose').addEventListener('click', () => document.getElementById('passModal').classList.remove('open'));
+
+/* 이용권 코드 등록 */
+document.getElementById('pmRedeem').addEventListener('click', async () => {
+  const code = document.getElementById('pmCode').value.trim();
+  const msg = document.getElementById('pmMsg');
+  if (!code) return;
+  try {
+    const { data: days, error } = await sb.rpc('redeem_code', { p_code: code });
+    if (error) throw error;
+    me = await loadMyProfile(me.id); // 만료일 갱신
+    renderTopbar();
+    document.getElementById('pmStatus').textContent = `플러스 · ${fmtDate(me.plus_expires_at)}까지`;
+    msg.className = 'msg ok';
+    msg.textContent = `+${days}일이 적립됐어요! 팝! 🍿`;
+    document.getElementById('pmCode').value = '';
+  } catch (e) {
+    msg.className = 'msg bad';
+    msg.textContent = e.message || '코드 등록에 실패했어요.';
+  }
+});
+
+/* 관리자에게 요청 */
+document.getElementById('reqSend').addEventListener('click', async () => {
+  const content = document.getElementById('reqContent').value.trim();
+  const msg = document.getElementById('reqMsg');
+  if (!content) return;
+  const { error } = await sb.from('requests').insert({ user_id: me.id, content });
+  msg.className = error ? 'msg bad' : 'msg ok';
+  msg.textContent = error ? ('전송 실패: ' + error.message) : '요청을 보냈어요! 확인 후 반영할게요.';
+  if (!error) document.getElementById('reqContent').value = '';
+});
+
+/* 닉네임 변경 */
+document.getElementById('pmNickSave').addEventListener('click', async () => {
+  const nick = document.getElementById('pmNick').value.trim();
+  const msg = document.getElementById('pmNickMsg');
+  if (!nick) { msg.className = 'msg bad'; msg.textContent = '닉네임을 입력해 주세요.'; return; }
+  const { error } = await sb.from('profiles').update({ nickname: nick }).eq('id', me.id);
+  if (error) {
+    msg.className = 'msg bad';
+    msg.textContent = String(error.message).includes('duplicate')
+      ? '이미 사용 중인 닉네임이에요.' : '변경 실패: ' + error.message;
+    return;
+  }
+  me.nickname = nick;
+  msg.className = 'msg ok'; msg.textContent = '닉네임을 바꿨어요!';
+  renderTopbar();
+});
+
+/* 회원 탈퇴 — 두 번 확인 후 계정·데이터 전체 삭제 */
+document.getElementById('withdrawBtn').addEventListener('click', async () => {
+  if (!confirm('정말 탈퇴할까요?\n등록한 놀이·반·적립 내역이 모두 삭제되고 되돌릴 수 없어요.')) return;
+  const typed = prompt('탈퇴를 진행하려면 "탈퇴"라고 입력해 주세요.');
+  if (typed !== '탈퇴') return;
+  const { error } = await sb.rpc('delete_account');
+  if (error) return alert('탈퇴 처리에 실패했어요: ' + error.message);
+  alert('탈퇴가 완료됐어요. 그동안 함께해 주셔서 고마웠어요! 🍿');
+  await sb.auth.signOut();
+  location.href = 'index.html';
+});
+
+document.getElementById('logoutBtn').addEventListener('click', logout);
+</script>
+</body>
+</html>

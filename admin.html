@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>놀이팝 · 운영자</title>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #EAF4FE; --navy: #1E3A5F; --sun: #FFC93C;
+    --coral: #FF7B6B; --mint: #6ED3BF; --white: #fff; --line: #DCE8F5;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Gowun Dodum', sans-serif; background: #F7FAFE; color: var(--navy); }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 24px 20px 80px; }
+  .topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+  h1 { font-family: 'Jua', sans-serif; font-weight: 400; font-size: 24px; }
+  h1 .pop { color: var(--coral); }
+  .top-right { margin-left: auto; display: flex; gap: 8px; }
+  .btn { font-family: 'Jua', sans-serif; font-size: 15px; border: none; border-radius: 12px; padding: 11px 20px; cursor: pointer; }
+  .btn-primary { background: var(--sun); color: var(--navy); }
+  .btn-ghost { background: var(--sky); color: var(--navy); }
+  .btn-danger { background: #FDEDEA; color: #C94F3D; }
+  .mini { font-size: 13px; padding: 7px 12px; border-radius: 10px; }
+  .panel { background: var(--white); border: 1px solid var(--line); border-radius: 18px; padding: 22px; margin-bottom: 18px; }
+  h2 { font-family: 'Jua', sans-serif; font-weight: 400; font-size: 18px; margin-bottom: 12px; }
+
+  /* 탭 */
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+  .tab {
+    font-family: 'Jua', sans-serif; font-size: 14.5px; padding: 10px 16px; border-radius: 12px;
+    border: 1.5px solid var(--line); background: var(--white); color: var(--navy); cursor: pointer; position: relative;
+  }
+  .tab.on { background: var(--navy); border-color: var(--navy); color: var(--white); }
+  .tab .n {
+    background: var(--coral); color: var(--white); font-size: 11px; border-radius: 999px;
+    padding: 1px 7px; margin-left: 5px;
+  }
+
+  /* 통계 카드 */
+  .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .stat { background: var(--sky); border-radius: 14px; padding: 14px 16px; }
+  .stat b { font-family: 'Jua', sans-serif; font-size: 24px; font-weight: 400; display: block; }
+  .stat span { font-size: 12.5px; opacity: .65; }
+
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border-bottom: 1px solid var(--line); padding: 9px 10px; text-align: left; font-size: 13.5px; vertical-align: middle; }
+  th { font-family: 'Jua', sans-serif; font-weight: 400; font-size: 13px; opacity: .65; }
+  .item { display: flex; gap: 12px; align-items: flex-start; padding: 14px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .item:last-child { border-bottom: none; }
+  .item img, .item .ph { width: 90px; aspect-ratio: 4/3; border-radius: 10px; object-fit: cover; background: var(--sky); flex-shrink: 0; }
+  .item .ph { display: flex; align-items: center; justify-content: center; font-family: 'Jua', sans-serif; font-size: 28px; color: var(--white); }
+  .item-info { flex: 1; min-width: 220px; }
+  .item-title { font-family: 'Jua', sans-serif; font-size: 16px; }
+  .item-meta { font-size: 12.5px; opacity: .6; margin-top: 4px; line-height: 1.6; }
+  .item-desc { font-size: 13px; background: var(--sky); border-radius: 10px; padding: 8px 12px; margin-top: 6px; white-space: pre-wrap; }
+  .row-btns { display: flex; gap: 7px; align-items: center; flex-wrap: wrap; }
+  .empty { opacity: .5; font-size: 14px; padding: 14px 0; }
+  input[type=text], input[type=number], select, textarea {
+    font-family: inherit; font-size: 14px; color: var(--navy);
+    padding: 9px 12px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--white);
+  }
+  textarea { width: 100%; resize: vertical; line-height: 1.6; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--sun); }
+  label { display: block; font-size: 13px; opacity: .7; margin: 12px 0 5px; }
+  .msg { font-size: 14px; margin-top: 10px; display: none; }
+  .msg.ok { color: #1F8A70; display: block; }
+  .msg.bad { color: var(--coral); display: block; }
+  .checklist { font-size: 13px; background: rgba(255,201,60,.15); border-radius: 12px; padding: 10px 14px; margin-bottom: 12px; line-height: 1.8; }
+  code.codebox { font-family: monospace; background: var(--sky); border-radius: 8px; padding: 3px 8px; }
+  .set-row { display: flex; gap: 10px; align-items: center; margin: 8px 0; flex-wrap: wrap; }
+  .set-row .k { width: 220px; font-size: 13.5px; }
+  .set-row input { width: 130px; }
+</style>
+<link rel="stylesheet" href="css/pop.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <h1>놀이<span class="pop">팝</span> · 운영자 ⚙️</h1>
+    <div class="top-right">
+      <a class="btn btn-ghost mini" href="my.html" style="text-decoration:none">🏠 내 관리</a>
+      <a class="btn btn-ghost mini" href="library.html" style="text-decoration:none">🍿 라이브러리</a>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab on" data-tab="dash">📊 현황</button>
+    <button class="tab" data-tab="review">🔍 검수 <span class="n" id="nPending" style="display:none"></span></button>
+    <button class="tab" data-tab="plays">🏅 공개 놀이</button>
+    <button class="tab" data-tab="members">👩‍🏫 회원</button>
+    <button class="tab" data-tab="codes">🎟️ 코드</button>
+    <button class="tab" data-tab="reqs">✉️ 요청함 <span class="n" id="nReqs" style="display:none"></span></button>
+    <button class="tab" data-tab="notice">📢 공지</button>
+    <button class="tab" data-tab="settings">⚙️ 정책 설정</button>
+  </div>
+
+  <!-- 현황 -->
+  <div class="panel" id="tab-dash">
+    <h2>한눈에 보기</h2>
+    <div class="stats" id="statsBox"></div>
+  </div>
+
+  <!-- 검수 -->
+  <div class="panel" id="tab-review" style="display:none">
+    <h2>공개 신청 검수</h2>
+    <div class="checklist">
+      ✅ 승인 기준 5가지: ① 링크 열림 ② 유아에게 부적절한 내용 없음 ③ 자체 제작(상업 캐릭터 무단 사용 없음) ④ 제목·분류 일치 ⑤ 개인정보 노출 없음
+      — 3분 안에 판단 안 서면 반려 + 수정 안내 (docs/04_공개놀이_검수기준.md)
+    </div>
+    <div id="pendingList"></div>
+  </div>
+
+  <!-- 공개 놀이 (에디터 픽) -->
+  <div class="panel" id="tab-plays" style="display:none">
+    <h2>공개된 놀이 — 에디터 픽 관리</h2>
+    <p class="checklist">🏅 에디터 픽 = 바로 수업에 쓸 수 있는 완성도 + 독창성·시의성. 월 2~4개 권장. 선정 시 작성자에게 +2개월 자동 적립(놀이당 1회).</p>
+    <div id="publicList"></div>
+  </div>
+
+  <!-- 회원 -->
+  <div class="panel" id="tab-members" style="display:none">
+    <h2>회원 목록</h2>
+    <div style="overflow-x:auto"><table id="memberTable"></table></div>
+  </div>
+
+  <!-- 코드 -->
+  <div class="panel" id="tab-codes" style="display:none">
+    <h2>이용권 코드 발급</h2>
+    <p class="checklist">아임웹에서 이용권이 팔리면 → 여기서 코드를 발급해 구매자에게 전달하세요. 회원은 "이용권·적립" 창에서 코드를 입력해요.</p>
+    <div class="set-row">
+      <span>기간</span><input type="number" id="codeDays" value="30" min="1"> 일 ×
+      <input type="number" id="codeCount" value="1" min="1" max="50"> 개
+      <button class="btn btn-primary mini" id="genCodes">발급하기</button>
+    </div>
+    <div class="msg" id="codeMsg"></div>
+    <h2 style="margin-top:20px">발급된 코드</h2>
+    <div style="overflow-x:auto"><table id="codeTable"></table></div>
+  </div>
+
+  <!-- 요청함 -->
+  <div class="panel" id="tab-reqs" style="display:none">
+    <h2>관리자에게 요청</h2>
+    <div id="reqList"></div>
+  </div>
+
+  <!-- 공지 -->
+  <div class="panel" id="tab-notice" style="display:none">
+    <h2>공지 작성</h2>
+    <label>제목</label><input type="text" id="ntTitle" style="width:100%">
+    <label>내용</label><textarea id="ntBody" rows="4"></textarea>
+    <div style="margin-top:12px"><button class="btn btn-primary mini" id="ntSave">공지 올리기</button></div>
+    <div class="msg" id="ntMsg"></div>
+    <h2 style="margin-top:20px">지난 공지</h2>
+    <div id="ntList"></div>
+  </div>
+
+  <!-- 정책 설정 -->
+  <div class="panel" id="tab-settings" style="display:none">
+    <h2>정책 숫자 설정</h2>
+    <p class="checklist">⚠️ 저장 즉시 서비스에 반영돼요. 이미 지급된 이용권은 줄어들지 않아요.</p>
+    <div id="settingRows"></div>
+    <div style="margin-top:14px"><button class="btn btn-primary mini" id="setSave">설정 저장</button></div>
+    <div class="msg" id="setMsg"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/common.js"></script>
+<script>
+const PALETTE = ['#6ED3BF', '#FFC93C', '#FF7B6B', '#8FB8F6', '#C9A0F0'];
+let me = null;
+let settings = {};
+
+/* 설정 화면에 노출할 항목 (키: 라벨) */
+const SETTING_LABELS = {
+  price_display:          '플러스 1개월권 표시 가격 (원)',
+  founding_enabled:       '오픈 멤버 가입 증정 켜기 (true/false)',
+  founding_gift_days:     '가입 증정 일수 (오픈 180 → 마감 후 14)',
+  open_member_limit:      '오픈 멤버 선착순 인원',
+  contribute_reward_days: '공개 놀이 승인 적립 (일)',
+  editor_pick_reward_days:'에디터 픽 적립 (일)',
+  info_reward_days:       '추가 정보 입력 적립 (일)',
+  accrual_cap_days:       '적립 보유 상한 (일)',
+  free_play_limit:        '무료 회원 등록 개수 제한',
+  points_attendance:      '출석 점수 (1일)',
+  points_register:        '등록 점수',
+  points_saved:           '담김 점수',
+  intro_video_url:        '영상① 링크 등록 방법 (유튜브 주소 — 넣으면 랜딩에 자동 표시)',
+  tablet_video_url:       '영상② 태블릿 연결하기 (유튜브 주소)'
+};
+
+/* ───── 초기화: 관리자만 입장 ───── */
+(async () => {
+  const session = await requireAuth();
+  if (!session) return;
+  me = await loadMyProfile(session.user.id);
+  if (me.role !== 'admin') {
+    alert('운영자 전용 페이지예요.');
+    location.href = 'my.html';
+    return;
+  }
+  settings = await loadSettings();
+  bindTabs();
+  await Promise.all([loadStats(), loadPending(), loadRequestsBadge()]);
+})();
+
+function bindTabs() {
+  document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === t));
+    ['dash','review','plays','members','codes','reqs','notice','settings'].forEach(id =>
+      document.getElementById('tab-' + id).style.display = t.dataset.tab === id ? 'block' : 'none');
+    // 탭 열 때 데이터 로드
+    if (t.dataset.tab === 'plays') loadPublic();
+    if (t.dataset.tab === 'members') loadMembers();
+    if (t.dataset.tab === 'codes') loadCodes();
+    if (t.dataset.tab === 'reqs') loadRequests();
+    if (t.dataset.tab === 'notice') loadNotices();
+    if (t.dataset.tab === 'settings') renderSettings();
+    if (t.dataset.tab === 'dash') loadStats();
+    if (t.dataset.tab === 'review') loadPending();
+  }));
+}
+
+/* ───── 현황 ───── */
+async function loadStats() {
+  const { data, error } = await sb.rpc('admin_stats');
+  if (error) { console.error(error); return; }
+  const s = data;
+  const openLimit = parseInt(settings.open_member_limit) || 100;
+  const items = [
+    [s.members, '전체 회원'],
+    [`${s.open_members} / ${openLimit}`, '오픈 멤버 (선착순)'],
+    [s.plus_members, '현재 플러스 회원'],
+    [s.plays_total, '등록된 놀이·업무'],
+    [s.plays_public, '공개 놀이'],
+    [s.plays_pending, '검수 대기'],
+    [s.classes, '만들어진 반'],
+    [s.saves_total, '누적 담김'],
+    [s.requests_open, '미처리 요청']
+  ];
+  document.getElementById('statsBox').innerHTML =
+    items.map(([v, k]) => `<div class="stat"><b>${v}</b><span>${k}</span></div>`).join('');
+}
+
+/* ───── 검수 ───── */
+async function loadPending() {
+  const { data, error } = await sb.rpc('admin_pending_plays');
+  if (error) { console.error(error); return; }
+  const list = data || [];
+  const badge = document.getElementById('nPending');
+  badge.style.display = list.length ? 'inline' : 'none';
+  badge.textContent = list.length;
+  const box = document.getElementById('pendingList');
+  box.innerHTML = list.length ? '' : '<p class="empty">검수 대기 중인 놀이가 없어요. 🍿</p>';
+  list.forEach((p, i) => {
+    const div = document.createElement('div');
+    div.className = 'item';
+    const thumb = p.thumb_url ? `<img src="${esc(p.thumb_url)}" alt="">`
+      : `<div class="ph" style="background:${PALETTE[i % PALETTE.length]}">${esc(p.title.charAt(0))}</div>`;
+    div.innerHTML = `${thumb}
+      <div class="item-info">
+        <div class="item-title">${p.category === '업무' ? '📋' : '🎠'} ${p.is_ai ? '🤖 ' : ''}${esc(p.title)}</div>
+        <div class="item-meta">${esc(p.nickname)} (${esc(p.email)})　|　${(p.ages || []).map(a => a + '세').join('·')}　|　${esc((p.themes || []).join(', '))}　|　${esc((p.types || []).join(', '))}</div>
+        ${p.description ? `<div class="item-desc">${esc(p.description)}</div>` : ''}
+      </div>
+      <div class="row-btns">
+        <button class="btn btn-ghost mini" data-open>↗ 열어보기</button>
+        ${p.category === '놀이' ? '<button class="btn btn-ghost mini" data-fix>🛠 기기·역량 보완</button>' : ''}
+        <button class="btn btn-primary mini" data-ok>✅ 승인 (+2주 적립)</button>
+        <button class="btn btn-danger mini" data-no>반려·수정 안내</button>
+      </div>`;
+    // 관리자가 검수하면서 기기·역량을 보완 입력 (선생님 등록 부담 ↓, 라이브러리 품질 ↑)
+    if (p.category === '놀이') {
+      const fix = document.createElement('div');
+      fix.style.cssText = 'display:none; width:100%; background:var(--sky); border-radius:12px; padding:12px 14px; margin-top:6px';
+      fix.innerHTML = `
+        <p style="font-size:12.5px; opacity:.7; margin-bottom:6px">구현 기기</p><div class="chip-row" data-dev></div>
+        <p style="font-size:12.5px; opacity:.7; margin:10px 0 6px">디지털 역량</p><div class="chip-row" data-comp></div>
+        <p style="font-size:12.5px; opacity:.7; margin:10px 0 6px">🤖 AI 리터러시 (AI 활용 놀이일 때만 선택)</p><div class="chip-row" data-ai></div>
+        <div style="margin-top:10px"><button class="btn btn-primary mini" data-fixsave>보완 저장</button>
+        <span class="msg" style="display:inline; margin-left:8px" data-fixmsg></span></div>`;
+      const mkChip = (label, on, value) => {
+        const c = document.createElement('button');
+        c.type = 'button'; c.className = 'chip' + (on ? ' on' : '');
+        c.textContent = label; c.dataset.value = value;
+        c.addEventListener('click', () => c.classList.toggle('on'));
+        return c;
+      };
+      (settings.devices || []).forEach(d => fix.querySelector('[data-dev]').appendChild(mkChip(d, (p.devices || []).includes(d), d)));
+      (settings.competencies || []).forEach(c => fix.querySelector('[data-comp]').appendChild(mkChip(`${c.emoji || ''} ${c.name}`, (p.competencies || []).includes(c.name), c.name)));
+      (settings.ai_elements || []).forEach(a => fix.querySelector('[data-ai]').appendChild(mkChip(`${a.emoji || ''} ${a.name}`, (p.ai_elements || []).includes(a.name), a.name)));
+      fix.querySelector('[data-fixsave]').addEventListener('click', async () => {
+        const devices = [...fix.querySelectorAll('[data-dev] .chip.on')].map(c => c.dataset.value);
+        const competencies = [...fix.querySelectorAll('[data-comp] .chip.on')].map(c => c.dataset.value);
+        const ai_elements = [...fix.querySelectorAll('[data-ai] .chip.on')].map(c => c.dataset.value);
+        const is_ai = ai_elements.length > 0 ? true : !!p.is_ai; // 요소를 고르면 AI 놀이로 표시
+        const { error } = await sb.from('plays').update({ devices, competencies, ai_elements, is_ai }).eq('id', p.id);
+        const m = fix.querySelector('[data-fixmsg]');
+        m.textContent = error ? '실패: ' + error.message : '저장됨!';
+        m.style.color = error ? 'var(--coral)' : '#1F8A70';
+      });
+      div.appendChild(fix);
+      div.querySelector('[data-fix]').addEventListener('click', () => {
+        fix.style.display = fix.style.display === 'none' ? 'block' : 'none';
+      });
+    }
+    div.querySelector('[data-open]').addEventListener('click', () => window.open(p.url, '_blank', 'noopener,width=1100,height=750'));
+    div.querySelector('[data-ok]').addEventListener('click', async () => {
+      const { error } = await sb.rpc('review_play', { p_play: p.id, p_approve: true });
+      if (error) return alert(error.message);
+      await loadPending(); loadStats();
+    });
+    div.querySelector('[data-no]').addEventListener('click', async () => {
+      const note = prompt('수정 안내 문구 (선생님에게 보여요 — 검수 기준 문서의 예시 참고)',
+        '내용은 좋아요! ○○ 부분만 수정하면 바로 공개할 수 있어요. 교실에서 쓰시는 건 지금도 문제없어요!');
+      if (note === null) return;
+      const { error } = await sb.rpc('review_play', { p_play: p.id, p_approve: false, p_note: note });
+      if (error) return alert(error.message);
+      await loadPending(); loadStats();
+    });
+    box.appendChild(div);
+  });
+}
+
+/* ───── 공개 놀이 / 에디터 픽 ───── */
+async function loadPublic() {
+  const { data, error } = await sb.from('plays').select('*').eq('visibility', 'public').order('save_count', { ascending: false });
+  if (error) return console.error(error);
+  const box = document.getElementById('publicList');
+  box.innerHTML = (data || []).length ? '' : '<p class="empty">아직 공개된 놀이가 없어요.</p>';
+  (data || []).forEach((p, i) => {
+    const div = document.createElement('div');
+    div.className = 'item';
+    const thumb = p.thumb_url ? `<img src="${esc(p.thumb_url)}" alt="">`
+      : `<div class="ph" style="background:${PALETTE[i % PALETTE.length]}">${esc(p.title.charAt(0))}</div>`;
+    div.innerHTML = `${thumb}
+      <div class="item-info">
+        <div class="item-title">${p.editor_pick ? '🏅 ' : ''}${esc(p.title)}</div>
+        <div class="item-meta">🍿 담김 ${p.save_count}　|　${(p.ages || []).map(a => a + '세').join('·')}</div>
+      </div>
+      <div class="row-btns">
+        <button class="btn btn-ghost mini" data-open>↗</button>
+        <button class="btn ${p.editor_pick ? 'btn-danger' : 'btn-primary'} mini" data-pick>${p.editor_pick ? '픽 해제' : '🏅 에디터 픽 (+2개월)'}</button>
+      </div>`;
+    div.querySelector('[data-open]').addEventListener('click', () => window.open(p.url, '_blank', 'noopener,width=1100,height=750'));
+    div.querySelector('[data-pick]').addEventListener('click', async () => {
+      const { error } = await sb.rpc('set_editor_pick', { p_play: p.id, p_on: !p.editor_pick });
+      if (error) return alert(error.message);
+      loadPublic();
+    });
+    box.appendChild(div);
+  });
+}
+
+/* ───── 회원 ───── */
+async function loadMembers() {
+  const { data, error } = await sb.from('profiles').select('*').order('created_at', { ascending: false });
+  if (error) return console.error(error);
+  const rows = (data || []).map(m => {
+    const plus = m.plus_expires_at && new Date(m.plus_expires_at + 'T23:59:59') >= new Date();
+    return `<tr>
+      <td>${esc(m.nickname)}${m.role === 'admin' ? ' ⚙️' : ''}</td>
+      <td>${esc(m.email)}</td>
+      <td>${m.points}점</td>
+      <td>${plus ? '플러스 ~' + m.plus_expires_at : '무료'}</td>
+      <td>${new Date(m.created_at).toLocaleDateString('ko-KR')}</td>
+      <td><button class="btn btn-ghost mini" data-grant="${m.id}" data-name="${esc(m.nickname)}">기간 지급</button></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('memberTable').innerHTML =
+    `<tr><th>닉네임</th><th>이메일</th><th>점수</th><th>이용권</th><th>가입일</th><th></th></tr>` + rows;
+  document.querySelectorAll('[data-grant]').forEach(b => b.addEventListener('click', async () => {
+    const days = prompt(`${b.dataset.name} 님에게 지급할 일수 (음수면 차감)`, '30');
+    if (!days) return;
+    const { error } = await sb.rpc('admin_grant_days', { p_user: b.dataset.grant, p_days: parseInt(days), p_note: '관리자 지급' });
+    if (error) return alert(error.message);
+    loadMembers();
+  }));
+}
+
+/* ───── 코드 ───── */
+function randCode() {
+  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // 헷갈리는 글자(I,L,O,0,1) 제외
+  const seg = n => Array.from({length: n}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  return `POP-${seg(4)}-${seg(4)}`;
+}
+document.getElementById('genCodes').addEventListener('click', async () => {
+  const days = parseInt(document.getElementById('codeDays').value) || 30;
+  const count = Math.min(parseInt(document.getElementById('codeCount').value) || 1, 50);
+  const rows = Array.from({length: count}, () => ({ code: randCode(), days }));
+  const { error } = await sb.from('pass_codes').insert(rows);
+  const msg = document.getElementById('codeMsg');
+  msg.className = error ? 'msg bad' : 'msg ok';
+  msg.textContent = error ? ('발급 실패: ' + error.message) : `${count}개 발급 완료!`;
+  loadCodes();
+});
+async function loadCodes() {
+  const { data, error } = await sb.from('pass_codes').select('*').order('created_at', { ascending: false }).limit(100);
+  if (error) return console.error(error);
+  const rows = (data || []).map(c => `<tr>
+    <td><code class="codebox">${c.code}</code></td>
+    <td>${c.days}일</td>
+    <td>${c.used_by ? '✅ 사용됨 (' + new Date(c.used_at).toLocaleDateString('ko-KR') + ')' : '⬜ 미사용'}</td>
+    <td>${new Date(c.created_at).toLocaleDateString('ko-KR')}</td>
+    <td>${c.used_by ? '' : `<button class="btn btn-ghost mini" data-copy="${c.code}">복사</button>`}</td>
+  </tr>`).join('');
+  document.getElementById('codeTable').innerHTML =
+    `<tr><th>코드</th><th>기간</th><th>상태</th><th>발급일</th><th></th></tr>` + rows;
+  document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(b.dataset.copy); b.textContent = '복사됨!'; }
+    catch (e) { prompt('코드를 복사하세요:', b.dataset.copy); }
+    setTimeout(() => b.textContent = '복사', 1500);
+  }));
+}
+
+/* ───── 요청함 ───── */
+async function loadRequestsBadge() {
+  const { count } = await sb.from('requests').select('*', { count: 'exact', head: true }).eq('status', '접수');
+  const badge = document.getElementById('nReqs');
+  badge.style.display = count ? 'inline' : 'none';
+  badge.textContent = count || '';
+}
+async function loadRequests() {
+  const { data, error } = await sb.from('requests').select('*, profiles(nickname)').order('created_at', { ascending: false });
+  if (error) return console.error(error);
+  const box = document.getElementById('reqList');
+  box.innerHTML = (data || []).length ? '' : '<p class="empty">요청이 없어요.</p>';
+  (data || []).forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'item';
+    div.innerHTML = `
+      <div class="item-info">
+        <div class="item-meta">${esc(r.profiles?.nickname || '?')} · ${new Date(r.created_at).toLocaleDateString('ko-KR')} · <b>${r.status}</b>${r.admin_note ? ' — ' + esc(r.admin_note) : ''}</div>
+        <div style="font-size:14px; margin-top:4px">${esc(r.content)}</div>
+      </div>
+      <div class="row-btns">
+        <button class="btn btn-primary mini" data-st="반영">반영</button>
+        <button class="btn btn-ghost mini" data-st="보류">보류</button>
+      </div>`;
+    div.querySelectorAll('[data-st]').forEach(b => b.addEventListener('click', async () => {
+      const note = prompt('처리 메모 (선택)', r.admin_note || '');
+      const { error } = await sb.from('requests').update({ status: b.dataset.st, admin_note: note || null }).eq('id', r.id);
+      if (error) return alert(error.message);
+      loadRequests(); loadRequestsBadge();
+    }));
+    box.appendChild(div);
+  });
+}
+
+/* ───── 공지 ───── */
+document.getElementById('ntSave').addEventListener('click', async () => {
+  const title = document.getElementById('ntTitle').value.trim();
+  const body = document.getElementById('ntBody').value.trim();
+  const msg = document.getElementById('ntMsg');
+  if (!title || !body) { msg.className = 'msg bad'; msg.textContent = '제목과 내용을 입력해 주세요.'; return; }
+  const { error } = await sb.from('announcements').insert({ title, body });
+  msg.className = error ? 'msg bad' : 'msg ok';
+  msg.textContent = error ? error.message : '공지를 올렸어요!';
+  if (!error) { document.getElementById('ntTitle').value = ''; document.getElementById('ntBody').value = ''; loadNotices(); }
+});
+async function loadNotices() {
+  const { data } = await sb.from('announcements').select('*').order('created_at', { ascending: false }).limit(20);
+  document.getElementById('ntList').innerHTML = (data || []).map(n =>
+    `<div class="item"><div class="item-info">
+      <div class="item-title">${esc(n.title)}</div>
+      <div class="item-meta">${new Date(n.created_at).toLocaleDateString('ko-KR')}</div>
+      <div style="font-size:13.5px; margin-top:4px; white-space:pre-wrap">${esc(n.body)}</div>
+    </div></div>`).join('') || '<p class="empty">공지가 없어요.</p>';
+}
+
+/* ───── 정책 설정 ───── */
+function renderSettings() {
+  const box = document.getElementById('settingRows');
+  box.innerHTML = '';
+  Object.entries(SETTING_LABELS).forEach(([key, label]) => {
+    const val = settings[key];
+    const row = document.createElement('div');
+    row.className = 'set-row';
+    row.innerHTML = `<span class="k">${label}</span><input type="text" data-key="${key}" value="${esc(String(val ?? ''))}">`;
+    box.appendChild(row);
+  });
+  // 주제·유형·기기는 쉼표 목록으로 편집
+  const LIST_LABELS = { themes: '놀이 주제 목록', types: '활동 유형 목록', devices: '구현 기기 목록', work_categories: '업무 자료 분류 목록' };
+  Object.entries(LIST_LABELS).forEach(([key, label]) => {
+    const row = document.createElement('div');
+    row.className = 'set-row';
+    row.innerHTML = `<span class="k">${label} (쉼표로 구분)</span>
+      <input type="text" data-key="${key}" data-list="1" value="${esc((settings[key] || []).join(', '))}" style="flex:1; min-width:300px">`;
+    box.appendChild(row);
+  });
+  // 사용안내 샘플 양식 (여러 줄)
+  const tplRow = document.createElement('div');
+  tplRow.className = 'set-row';
+  tplRow.style.alignItems = 'flex-start';
+  tplRow.innerHTML = `<span class="k">사용안내 샘플 양식</span>
+    <textarea data-key="desc_template" data-text="1" rows="7" style="flex:1; min-width:300px">${esc(String(settings.desc_template || ''))}</textarea>`;
+  box.appendChild(tplRow);
+}
+document.getElementById('setSave').addEventListener('click', async () => {
+  const msg = document.getElementById('setMsg');
+  try {
+    for (const input of document.querySelectorAll('#settingRows input, #settingRows textarea')) {
+      const key = input.dataset.key;
+      let value;
+      if (input.dataset.list) value = input.value.split(',').map(s => s.trim()).filter(Boolean);
+      else if (input.dataset.text) value = input.value; // 여러 줄 텍스트는 그대로
+      else if (input.value === 'true' || input.value === 'false') value = input.value === 'true';
+      else if (!isNaN(Number(input.value)) && input.value !== '') value = Number(input.value);
+      else value = input.value;
+      const { error } = await sb.from('app_settings')
+        .upsert({ key, value, updated_at: new Date().toISOString() });
+      if (error) throw error;
+    }
+    settings = await loadSettings();
+    msg.className = 'msg ok'; msg.textContent = '저장했어요! 바로 반영돼요.';
+  } catch (e) {
+    msg.className = 'msg bad'; msg.textContent = '저장 실패: ' + (e.message || e);
+  }
+});
+</script>
+</body>
+</html>
