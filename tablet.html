@@ -74,12 +74,21 @@
   }
   .c-sheet h2 { font-family: 'Jua', sans-serif; font-weight: 400; font-size: 26px; }
   .c-sheet p { font-size: 14px; opacity: .65; margin: 10px 0 20px; line-height: 1.6; }
-  .code-input {
-    width: 100%; font-family: 'Jua', sans-serif; font-size: 26px; text-align: center;
-    letter-spacing: 3px; padding: 14px; border: 2px solid var(--sky); border-radius: 16px;
-    color: var(--navy); text-transform: uppercase;
+  .code-field {
+    width: 100%; display: flex; align-items: center; justify-content: center;
+    border: 2px solid var(--sky); border-radius: 16px; overflow: hidden;
+    color: var(--navy); background: var(--white);
   }
-  .code-input:focus { outline: none; border-color: var(--sun); }
+  .code-field:focus-within { border-color: var(--sun); }
+  .code-prefix {
+    font-family: 'Jua', sans-serif; font-size: 26px; letter-spacing: 2px;
+    padding: 14px 0 14px 14px; user-select: none;
+  }
+  .code-input {
+    width: 180px; min-width: 0; font-family: 'Jua', sans-serif; font-size: 26px;
+    letter-spacing: 3px; padding: 14px 14px 14px 2px; border: 0; outline: 0;
+    color: var(--navy); background: transparent;
+  }
   .c-btn {
     width: 100%; font-family: 'Jua', sans-serif; font-size: 19px; margin-top: 18px;
     padding: 14px; border: none; border-radius: 16px; cursor: pointer;
@@ -130,7 +139,11 @@
   <div class="c-sheet">
     <h2>🍿 우리 반 연결하기</h2>
     <p>선생님 관리 페이지에 있는 <b>반 코드</b>를 입력해 주세요.<br>한 번만 하면 다음부터는 바로 놀이가 보여요.</p>
-    <input class="code-input" id="codeInput" placeholder="POP-000000" maxlength="10" autocomplete="off">
+    <div class="code-field">
+      <span class="code-prefix" aria-hidden="true">POP-</span>
+      <input class="code-input" id="codeInput" placeholder="000000" maxlength="6"
+             inputmode="numeric" pattern="[0-9]*" autocomplete="off" aria-label="반 코드 숫자 6자리">
+    </div>
     <button class="c-btn" id="codeBtn">연결하기</button>
     <div class="c-err" id="codeErr">코드를 찾을 수 없어요. 다시 확인해 주세요.</div>
     <p class="c-note">QR로 연결했다면 이 화면은 나오지 않아요.<br>반 코드는 관리 페이지 → 반 관리에서 볼 수 있어요.</p>
@@ -231,11 +244,15 @@ document.getElementById('closeBtn').addEventListener('click', () => {
 
 /* 반 코드로 연결 */
 async function connectByCode() {
-  let code = document.getElementById('codeInput').value.trim().toUpperCase().replace(/\s/g, '');
-  if (/^\d{6}$/.test(code)) code = 'POP-' + code; // 숫자만 입력해도 알아서 POP- 붙이기
+  const digits = document.getElementById('codeInput').value.replace(/\D/g, '').slice(0, 6);
+  const code = 'POP-' + digits;
   const err = document.getElementById('codeErr');
   err.style.display = 'none';
-  if (!code) return;
+  if (digits.length !== 6) {
+    err.textContent = '숫자 6자리를 입력해 주세요.';
+    err.style.display = 'block';
+    return;
+  }
   try {
     const { data, error } = await sb.rpc('connect_class', { p_code: code });
     if (error) throw error;
@@ -250,6 +267,9 @@ async function connectByCode() {
   }
 }
 document.getElementById('codeBtn').addEventListener('click', connectByCode);
+document.getElementById('codeInput').addEventListener('input', e => {
+  e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
+});
 document.getElementById('codeInput').addEventListener('keydown', e => { if (e.key === 'Enter') connectByCode(); });
 
 /* 전체화면 켜기/끄기 (선생님용 — 브라우저에서 열었을 때) */
