@@ -168,9 +168,9 @@
 <div class="wrap">
 
   <div class="steps">
-    <div class="step"><div class="num">1</div><h3>링크만 붙여넣어 등록</h3><p>Canva 사이트, 웹 게임 등 주소만 붙여넣으면 끝. 미리 채워진 양식의 000만 고치면 사용안내도 완성돼요.</p></div>
-    <div class="step"><div class="num">2</div><h3>QR 한 번으로 태블릿 연결</h3><p>반을 만들면 전용 QR이 생겨요. 태블릿 카메라로 찍으면 바로 우리 반 놀이 화면 — 아이는 로그인이 없어요.</p></div>
-    <div class="step"><div class="num">3</div><h3>공유하고 적립받기</h3><p>전체 공개로 승인되면 플러스 +2주, 에디터 픽은 +2개월. 나눌수록 계속 무료로 쓸 수 있어요.</p></div>
+    <div class="step"><div class="num">1</div><h3>흩어진 놀이, 한곳에 쏙!</h3><p>Canva부터 웹 게임까지, 링크를 붙여넣고 놀이를 소개해 주세요. 사용안내는 준비된 양식을 고치면 돼요.</p></div>
+    <div class="step"><div class="num">2</div><h3>QR 찍고, 우리 반 놀이 시작!</h3><p>반을 만들고 태블릿으로 QR을 찍어 보세요. 선생님이 고른 놀이가 한 화면에! 아이들은 로그인 없이 즐겨요.</p></div>
+    <div class="step"><div class="num">3</div><h3>놀이를 나누면, 혜택이 돌아와요!</h3><p>공유한 놀이가 공개 승인되면 플러스 2주 적립! 에디터 픽으로 선정되면 2개월 더 받아요.</p></div>
   </div>
 
   <section>
@@ -268,7 +268,7 @@ const PALETTE = ['#6ED3BF', '#FFC93C', '#FF7B6B', '#8FB8F6', '#C9A0F0'];
     const settings = await loadSettings();
     if (String(settings.founding_enabled) === 'true') {
       const days = parseInt(settings.founding_gift_days) || 0;
-      const limit = parseInt(settings.open_member_limit) || 100;
+      const limit = parseInt(settings.open_member_limit) || 50;
       if (days > 0) {
         const b = document.getElementById('foundingBanner');
         b.innerHTML = `🎉 오픈 멤버 선착순 ${limit}명 — 지금 가입하면 플러스 <b>${Math.round(days / 30)}개월</b> 자동 적립!`;

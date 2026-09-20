@@ -136,7 +136,7 @@ function setMode(m) {
   const on = String(settings.founding_enabled) === 'true';
   const days = parseInt(settings.founding_gift_days) || 0;
   if (m === 'signup' && on && days > 0) {
-    banner.innerHTML = `🎉 <b>오픈 멤버 혜택</b> (선착순 ${parseInt(settings.open_member_limit) || 100}명) — 지금 가입하면 플러스 이용권 <b>${Math.round(days / 30)}개월</b>이 자동으로 적립돼요!`;
+    banner.innerHTML = `🎉 <b>오픈 멤버 혜택</b> (선착순 ${parseInt(settings.open_member_limit) || 50}명) — 지금 가입하면 플러스 이용권 <b>${Math.round(days / 30)}개월</b>이 자동으로 적립돼요!`;
     banner.style.display = 'block';
   } else banner.style.display = 'none';
 }

@@ -179,7 +179,7 @@ let settings = {};
 const SETTING_LABELS = {
   price_display:          '플러스 1개월권 표시 가격 (원)',
   founding_enabled:       '오픈 멤버 가입 증정 켜기 (true/false)',
-  founding_gift_days:     '가입 증정 일수 (오픈 180 → 마감 후 14)',
+  founding_gift_days:     '오픈 멤버 가입 증정 일수 (1개월 = 30일)',
   open_member_limit:      '오픈 멤버 선착순 인원',
   contribute_reward_days: '공개 놀이 승인 적립 (일)',
   editor_pick_reward_days:'에디터 픽 적립 (일)',
@@ -230,7 +230,7 @@ async function loadStats() {
   const { data, error } = await sb.rpc('admin_stats');
   if (error) { console.error(error); return; }
   const s = data;
-  const openLimit = parseInt(settings.open_member_limit) || 100;
+  const openLimit = parseInt(settings.open_member_limit) || 50;
   const items = [
     [s.members, '전체 회원'],
     [`${s.open_members} / ${openLimit}`, '오픈 멤버 (선착순)'],
