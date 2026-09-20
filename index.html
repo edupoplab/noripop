@@ -77,7 +77,9 @@
   section > p.sec-sub { font-size: 14px; opacity: .6; margin-bottom: 18px; }
 
   /* ── 특징: 파스텔 카드 ── */
-  .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+  .features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  @media (max-width: 860px) { .features { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 540px) { .features { grid-template-columns: 1fr; } }
   .feat { border-radius: 18px; padding: 22px; }
   .feat.f1 { background: #FFF4D6; } .feat.f2 { background: #E4F6EF; }
   .feat.f3 { background: #F0ECFB; } .feat.f4 { background: #FDEEE9; }
@@ -179,14 +181,16 @@
     <div class="features">
       <div class="feat f1"><div class="ico">🎠</div><h3>등록하면 바로 우리 반 태블릿에</h3><p>기관 계정이 아니라 선생님 개인 계정. 이직·이동해도 내 놀이는 내 것이에요.</p></div>
       <div class="feat f2"><div class="ico">🍿</div><h3>거절 없는 적립 구조</h3><p>검수에서 반려돼도 탈락이 아니라 "수정 안내". 교실에서는 그대로 쓰면서 고쳐서 다시 공개할 수 있어요.</p></div>
-      <div class="feat f3"><div class="ico">🌟</div><h3>유아 디지털 역량 기반 분류</h3><p>교육부·경기도교육청 현장지원자료의 6대 역량으로 분류·검색. 수업 목적에 딱 맞는 놀이를 찾아요.</p></div>
+      <div class="feat f3"><div class="ico">🌟</div><h3>인간 중심 유아 AI 5대 역량으로</h3><p>AI 이해·창작·성찰·환경·윤리, 우리 반에서 기르고 싶은 역량에 맞춰 놀이를 찾아요.</p></div>
       <div class="feat f4"><div class="ico">🛡️</div><h3>유아 정보 제로</h3><p>유아 화면은 로그인이 없고, 아이의 어떤 정보도 수집하지 않아요. 수집은 교사 이메일·닉네임뿐.</p></div>
+      <div class="feat f1"><div class="ico">🔗</div><h3>여기저기 흩어진 링크를 한곳에</h3><p>Canva, 웹 게임 등 여러 곳의 놀이 링크를 모아 우리 반 아이들에게 한 화면으로 보여줘요.</p></div>
+      <div class="feat f2"><div class="ico">🎯</div><h3>오늘 필요한 놀이만 골라서</h3><p>주제와 놀이 유형별로 링크를 찾고, 오늘 우리 반에서 사용할 놀이만 골라 태블릿에 보여줘요.</p></div>
     </div>
   </section>
 
   <section>
     <h2>인간 중심 유아 AI 교육과 디지털 역량을 살펴봐요</h2>
-    <p class="sec-sub">태그를 고르는 것만으로 미니 연수가 되는 분류 체계 — 검색이 곧 수업 설계가 돼요</p>
+    <p class="sec-sub">놀이로 어떤 역량을 기를 수 있을까요? 쉬운 설명과 놀이 예시로 살펴보세요.</p>
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px">
       <a href="guide.html#ai" style="text-decoration:none; color:inherit; background:#E8EEFB; border-radius:18px; padding:22px; display:block">
         <div style="font-size:28px">🤖</div>
