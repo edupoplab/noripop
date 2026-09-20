@@ -77,6 +77,7 @@
   }
 </style>
 <link rel="stylesheet" href="css/pop.css">
+<link rel="stylesheet" href="css/preview.css">
 </head>
 <body>
 <div class="wrap">
@@ -96,7 +97,7 @@
     <div class="grp grp-age"><label>🎈 연령</label><div class="chip-grid" id="filterAge"></div></div>
     <div class="grp grp-dev"><label>📱 구현 기기</label><div class="chip-grid" id="filterDevice"></div></div>
     <div class="grp grp-comp"><label>🌟 디지털 역량</label><div class="chip-grid" id="filterComp"></div></div>
-    <div class="grp grp-ai"><label>🤖 AI 리터러시</label><div class="chip-grid" id="filterAi"></div></div>
+    <div class="grp grp-ai"><label>🌟 인간 중심 유아 AI 5대 역량</label><div class="chip-grid" id="filterAi"></div></div>
     <div class="grp">
       <label>⭐ 모아보기</label>
       <div class="chip-row">
@@ -131,6 +132,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
 <script src="js/common.js"></script>
+<script src="js/preview.js"></script>
 <script>
 const PALETTE = ['#6ED3BF', '#FFC93C', '#FF7B6B', '#8FB8F6', '#C9A0F0'];
 
@@ -191,7 +193,7 @@ async function loadItems() {
   // 공개 놀이 (게스트도 조회 가능 — RLS가 public만 허용)
   // 게스트에게는 url 컬럼 권한이 없어서 명시적으로 컬럼을 지정 (로그인 시에만 url 포함)
   const cols = 'id,owner_id,category,title,ages,themes,types,source,thumb_url,description,'
-    + 'visibility,editor_pick,save_count,created_at,competencies,devices,work_category,is_ai,ai_elements'
+    + 'visibility,editor_pick,save_count,created_at,competencies,devices,work_category,is_ai,ai_elements,preview_mode,preview_images'
     + (session ? ',url,open_mode' : '');
   const { data: plays, error } = await sb.from('plays').select(cols)
     .eq('visibility', 'public').order('created_at', { ascending: false });
@@ -214,7 +216,8 @@ function buildFilters() {
   buildRow('filterDevice', 'device', settings.devices || []);
   buildRow('filterComp', 'comp', (settings.competencies || []).map(c => c.name));
   buildRow('filterWorkCat', 'workCat', settings.work_categories || []);
-  buildRow('filterAi', 'ai', ['AI 활용 놀이', ...(settings.ai_elements || []).map(e => e.name)]);
+  buildRow('filterAi', 'ai', (settings.ai_elements || []).map(e => e.name));
+  document.querySelectorAll('#filterAi button').forEach(b => { b.textContent = aiLabel(b.textContent); });
   document.getElementById('pickOnly').addEventListener('click', e => {
     filters.pickOnly = !filters.pickOnly;
     e.target.classList.toggle('on', filters.pickOnly);
@@ -247,7 +250,7 @@ function render() {
     if (filters.cat === '업무') {
       return filters.workCat === '전체' || p.work_category === filters.workCat;
     }
-    if (filters.theme !== '전체' && !(p.themes || []).includes(filters.theme)) return false;
+    if (!matchesTheme(p.themes, filters.theme)) return false;
     if (filters.type !== '전체' && !(p.types || []).includes(filters.type)) return false;
     if (filters.age !== '전체' && !(p.ages || []).includes(filters.age.replace('세', ''))) return false;
     if (filters.device !== '전체' && !(p.devices || []).includes(filters.device)) return false;
@@ -307,7 +310,7 @@ function render() {
     };
     div.querySelector('[data-prev]').addEventListener('click', () => {
       if (!session || !p.url) return needLogin();
-      window.open(p.url, '_blank', 'noopener,width=1100,height=750');
+      openPlayPreview(p);
     });
     const saveBtn = div.querySelector('[data-save]');
     if (saveBtn) saveBtn.addEventListener('click', () => startSave(p));

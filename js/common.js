@@ -17,7 +17,19 @@ async function loadSettings() {
   if (error) throw error;
   const out = {};
   (data || []).forEach(r => { out[r.key] = r.value; });
+  // 저장 순서와 관계없이 ‘주제 무관’은 모든 주제 선택 목록의 마지막에 표시합니다.
+  out.themes = [...new Set([...(out.themes || []).map(t => t === '생명과 우주' ? '지구와 우주' : t), '기본생활습관', '감정'])].filter(t => t !== '주제 무관');
+  out.themes.push('주제 무관');
   return out;
+}
+
+// 저장된 기존 태그 값은 보존하고 새 교육 용어로 표시합니다.
+function aiLabel(name) {
+  return ({'AI 이해':'Of AI (이해)','AI와 창작':'With AI (창작)','AI로 성찰':'From AI (성찰)','AI 환경·균형':'In AI (환경)','AI 윤리·안전':'AI 윤리 (안전)'})[name] || name;
+}
+function matchesTheme(themes, selected) {
+  const values = (themes || []).map(t => t === '생명과 우주' ? '지구와 우주' : t);
+  return selected === '전체' || values.includes('주제 무관') || values.includes(selected);
 }
 
 // 점수 → 레벨 (level_thresholds 설정과 대조)

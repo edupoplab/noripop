@@ -73,6 +73,7 @@
   .set-row input { width: 130px; }
 </style>
 <link rel="stylesheet" href="css/pop.css">
+<link rel="stylesheet" href="css/preview.css">
 </head>
 <body>
 <div class="wrap">
@@ -168,6 +169,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
 <script src="js/common.js"></script>
+<script src="js/preview.js"></script>
 <script>
 const PALETTE = ['#6ED3BF', '#FFC93C', '#FF7B6B', '#8FB8F6', '#C9A0F0'];
 let me = null;
@@ -266,7 +268,9 @@ async function loadPending() {
         ${p.description ? `<div class="item-desc">${esc(p.description)}</div>` : ''}
       </div>
       <div class="row-btns">
-        <button class="btn btn-ghost mini" data-open>↗ 열어보기</button>
+        <button class="btn btn-ghost mini" data-open>↗ 원본 링크 검수</button>
+        <button class="btn btn-ghost mini" data-preview>등록된 미리보기 확인</button>
+        <p>미리보기: ${p.preview_mode === "gallery" ? "활동 사진 " + (p.preview_images || []).length + "장" : "내부 실행"} · 원본 및 앱 실행을 확인한 뒤 승인해 주세요.</p>
         ${p.category === '놀이' ? '<button class="btn btn-ghost mini" data-fix>🛠 기기·역량 보완</button>' : ''}
         <button class="btn btn-primary mini" data-ok>✅ 승인 (+2주 적립)</button>
         <button class="btn btn-danger mini" data-no>반려·수정 안내</button>
@@ -278,7 +282,7 @@ async function loadPending() {
       fix.innerHTML = `
         <p style="font-size:12.5px; opacity:.7; margin-bottom:6px">구현 기기</p><div class="chip-row" data-dev></div>
         <p style="font-size:12.5px; opacity:.7; margin:10px 0 6px">디지털 역량</p><div class="chip-row" data-comp></div>
-        <p style="font-size:12.5px; opacity:.7; margin:10px 0 6px">🤖 AI 리터러시 (AI 활용 놀이일 때만 선택)</p><div class="chip-row" data-ai></div>
+        <p style="font-size:12.5px; opacity:.7; margin:10px 0 6px">🌟 인간 중심 유아 AI 5대 역량</p><div class="chip-row" data-ai></div>
         <div style="margin-top:10px"><button class="btn btn-primary mini" data-fixsave>보완 저장</button>
         <span class="msg" style="display:inline; margin-left:8px" data-fixmsg></span></div>`;
       const mkChip = (label, on, value) => {
@@ -290,12 +294,12 @@ async function loadPending() {
       };
       (settings.devices || []).forEach(d => fix.querySelector('[data-dev]').appendChild(mkChip(d, (p.devices || []).includes(d), d)));
       (settings.competencies || []).forEach(c => fix.querySelector('[data-comp]').appendChild(mkChip(`${c.emoji || ''} ${c.name}`, (p.competencies || []).includes(c.name), c.name)));
-      (settings.ai_elements || []).forEach(a => fix.querySelector('[data-ai]').appendChild(mkChip(`${a.emoji || ''} ${a.name}`, (p.ai_elements || []).includes(a.name), a.name)));
+      (settings.ai_elements || []).forEach(a => fix.querySelector('[data-ai]').appendChild(mkChip(`${a.emoji || ''} ${aiLabel(a.name)}`, (p.ai_elements || []).includes(a.name), a.name)));
       fix.querySelector('[data-fixsave]').addEventListener('click', async () => {
         const devices = [...fix.querySelectorAll('[data-dev] .chip.on')].map(c => c.dataset.value);
         const competencies = [...fix.querySelectorAll('[data-comp] .chip.on')].map(c => c.dataset.value);
         const ai_elements = [...fix.querySelectorAll('[data-ai] .chip.on')].map(c => c.dataset.value);
-        const is_ai = ai_elements.length > 0 ? true : !!p.is_ai; // 요소를 고르면 AI 놀이로 표시
+        const is_ai = !!p.is_ai; // 교육 역량 선택은 실제 AI 기능 사용 여부와 별개
         const { error } = await sb.from('plays').update({ devices, competencies, ai_elements, is_ai }).eq('id', p.id);
         const m = fix.querySelector('[data-fixmsg]');
         m.textContent = error ? '실패: ' + error.message : '저장됨!';
@@ -307,6 +311,7 @@ async function loadPending() {
       });
     }
     div.querySelector('[data-open]').addEventListener('click', () => window.open(p.url, '_blank', 'noopener,width=1100,height=750'));
+    div.querySelector('[data-preview]').addEventListener('click', () => openPlayPreview(p));
     div.querySelector('[data-ok]').addEventListener('click', async () => {
       const { error } = await sb.rpc('review_play', { p_play: p.id, p_approve: true });
       if (error) return alert(error.message);

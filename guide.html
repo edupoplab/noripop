@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>놀이팝 · 유아 디지털 역량 & AI 리터러시 안내</title>
-<meta name="description" content="유아 디지털 역량 6대 영역과 유아 AI 리터러시 5요소를 쉽게 정리한 교사용 안내">
+<title>놀이팝 · 인간 중심 유아 AI 교육 & 디지털 역량 안내</title>
+<meta name="description" content="유아 디지털 역량 6대 영역과 인간 중심 유아 AI 교육의 5대 핵심요소를 쉽게 정리한 교사용 안내">
 <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -104,35 +104,35 @@
   </nav>
 
   <span class="badge-year">교사 안내</span>
-  <h1>유아 디지털 역량 & AI 리터러시</h1>
+  <h1>인간 중심 유아 AI 교육 & 디지털 역량</h1>
   <p class="intro">
     태블릿과 AI 스피커가 이미 교실과 가정에 들어와 있어요. 이제 질문은 "쓸까 말까"가 아니라
-    <b>"어떤 역량을 기르며 어떻게 쓸까"</b>입니다. 놀이팝은 국가 수준 자료의 두 가지 틀로 모든 놀이를 분류해요.
+    <b>"어떤 역량을 기르며 어떻게 쓸까"</b>입니다. 놀이팝에서 인간 중심 유아 AI 교육의 핵심요소와 디지털 역량을 함께 살펴보세요.
   </p>
 
   <div class="info-row"><span class="info-tag">누구에게</span>
     <div class="info-body">디지털 놀이를 쓰는 모든 유아교사 <small>※ 개념을 몰라도 괜찮아요 — 태그를 고르는 과정이 곧 미니 연수가 돼요</small></div></div>
   <div class="info-row"><span class="info-tag">무엇을</span>
-    <div class="info-body">디지털 역량 6대 영역 + AI 리터러시 5요소를 쉬운 말과 놀이 예시로</div></div>
+    <div class="info-body">인간 중심 유아 AI 5대 역량 + 디지털 역량 6대 영역를 쉬운 말과 놀이 예시로</div></div>
   <div class="info-row"><span class="info-tag">어디에</span>
     <div class="info-body">놀이 등록할 때 태그로, 라이브러리에서 "우리 반에 필요한 역량"으로 검색할 때</div></div>
 
   <div class="big-tabs">
-    <button class="big-tab on" id="tabComp">🌟 디지털 역량 6대 영역</button>
-    <button class="big-tab" id="tabAi">🤖 AI 리터러시 5요소</button>
+    <button class="big-tab on" id="tabAi">🌟 인간 중심 유아 AI 5대 역량</button>
+    <button class="big-tab" id="tabComp">🖥️ 디지털 역량 6대 영역</button>
   </div>
 
-  <div id="panelComp">
-    <p class="src">출처: 교육부·경기도교육청 「유아의 균형 있는 디지털 역량을 기르기 위한 교육 자료」(현장지원자료)를 쉽게 풀어 쓴 것</p>
+  <div id="panelComp" style="display:none">
+    <p class="src">출처: 교육부·경기도교육청 「유아의 균형 있는 디지털 역량을 기르기 위한 교육 자료」(2024년 12월 발행 현장지원자료)를 쉽게 풀어 쓴 것</p>
     <div id="compList"><p class="state">불러오는 중…</p></div>
   </div>
 
-  <div id="panelAi" style="display:none">
-    <p class="src">출처: OECD·유네스코 AI 역량 체계 기반 유아 AI 교육 자료(2026 교육부 디지털 선도교원 워크숍 전달연수)를 쉽게 풀어 쓴 것<br>
-    핵심 태도: AI는 "생각하는 사람"이 아니라 도구예요. 유아의 생각이 먼저, AI는 넓혀주는 역할 — 언제나 안전(개인정보 입력 금지)과 투명함(AI가 도왔음을 알리기)이 함께해요.</p>
+  <div id="panelAi">
+    <p class="src">출처: OECD·유네스코 AI 역량 체계 기반 유아 AI 교육 자료</p>
     <div id="aiList"><p class="state">불러오는 중…</p></div>
   </div>
 
+<p class="src"><a href="downloads/digital-competency-2024.pdf" download="유아의 균형 있는 디지털 역량을 기르기 위한 교육 자료_2024.pdf">📥 디지털 역량 현장지원자료 PDF 다운로드 (2024년 12월 · 약 35.4MB)</a></p>
   <div class="cta-band">
     <h3>이 역량들로 분류된 놀이가 기다리고 있어요 🍿</h3>
     <p>역량별로 찾고, 우리 반 태블릿에 담고, 내 놀이도 나눠보세요.</p>
@@ -154,6 +154,7 @@ function setTab(which) {
 }
 document.getElementById('tabComp').addEventListener('click', () => setTab('comp'));
 document.getElementById('tabAi').addEventListener('click', () => setTab('ai'));
+setTab(location.hash === '#digital' ? 'comp' : 'ai');
 
 (async () => {
   const { data: { session } } = await sb.auth.getSession();
@@ -170,7 +171,7 @@ document.getElementById('tabAi').addEventListener('click', () => setTab('ai'));
       <div class="item">
         <div class="no" style="background:${NO_BG[i % NO_BG.length]}">${c.emoji || (i + 1)}</div>
         <div>
-          <div class="name">영역 ${i + 1} · ${esc(c.name)}<span class="en">${esc(c[enKey] || '')}</span></div>
+          <div class="name">영역 ${i + 1} · ${esc(enKey === "en" ? aiLabel(c.name) : c.name)}<span class="en">${esc(c[enKey] || '')}</span></div>
           <div class="detail">${esc(c.detail || c.desc || '')}</div>
           <div class="ex">💡 이런 놀이예요: ${esc(c.ex || '')}</div>
         </div>

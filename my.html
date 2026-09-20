@@ -123,6 +123,7 @@
   .pass-days { font-weight: 700; color: #1F8A70; }
 </style>
 <link rel="stylesheet" href="css/pop.css">
+<link rel="stylesheet" href="css/preview.css">
 </head>
 <body>
 <div class="wrap">
@@ -168,24 +169,18 @@
           <label>🎠 활동 유형 <span class="req">*필수</span></label>
           <div class="chip-grid" id="fTypes"></div>
         </div>
+        <details class="optional-fields"><summary>추가 정보 (선택) · 기기, AI 역량</summary>
         <div class="grp grp-dev">
           <label>📱 구현 기기 <span class="opt">권장 · 여러 개 가능</span></label>
           <div class="chip-grid" id="fDevices"></div>
         </div>
-        <div class="grp grp-comp">
-          <label>🌟 유아 디지털 역량 <span class="opt">권장</span> <a href="#" id="compGuideLink" style="font-size:12px; color:inherit; opacity:.7; margin-left:6px">ⓘ 역량이 뭐예요?</a></label>
-          <div class="chip-grid" id="fComps"></div>
-        </div>
+        <div id="fComps" hidden></div>
         <div class="grp grp-ai">
-          <label style="display:flex; align-items:center; gap:8px; cursor:pointer">
-            <input type="checkbox" id="fIsAi" style="width:17px; height:17px; accent-color:#3B57A9">
-            🤖 이 놀이는 AI를 활용해요 <span class="opt">음성인식·생성형 AI·스마트 스피커 등</span>
-            <a href="#" id="aiGuideLink" style="font-size:12px; color:inherit; opacity:.7; margin-left:auto">ⓘ AI 리터러시?</a>
-          </label>
-          <div id="aiElemBox" style="display:none; margin-top:8px">
-            <div class="chip-grid" id="fAiElems"></div>
-          </div>
+          <label>🌟 인간 중심 유아 AI 5대 역량 <span class="opt">권장</span>
+            <a href="#" id="aiGuideLink">ⓘ 역량이 뭐예요?</a></label>
+          <div id="aiElemBox"><div class="chip-grid" id="fAiElems"></div></div>
         </div>
+        </details>
       </div>
 
       <div id="workOnly" style="display:none">
@@ -213,12 +208,12 @@
       </div>
       <p class="sticky-note" id="visNote"></p>
 
-      <label for="fDesc">사용안내 · 놀이방법 <span id="descReq">(놀이는 필수)</span>
+      <label for="fDesc">어떻게 노나요? <span id="descReq">(놀이는 필수)</span>
         <button type="button" class="btn btn-ghost mini" id="descTplBtn" style="margin-left:8px">📋 양식 불러오기</button>
       </label>
-      <textarea id="fDesc" rows="6"></textarea>
+      <textarea id="fDesc" rows="4" placeholder="무엇을 누르고 어떻게 노는지 간단히 알려 주세요."></textarea>
 
-      <label for="fThumb">썸네일 이미지 (선택)</label>
+      <label for="fThumb">대표 이미지 1장 (선택)</label>
       <input type="file" id="fThumb" accept="image/*">
       <img class="thumb-preview" id="thumbPreview" alt="썸네일 미리보기">
 
@@ -336,6 +331,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="js/config.js"></script>
 <script src="js/common.js"></script>
+<script src="js/preview.js"></script>
+<script src="js/preview-form.js"></script>
 <script>
 const PALETTE = ['#6ED3BF', '#FFC93C', '#FF7B6B', '#8FB8F6', '#C9A0F0'];
 
@@ -451,7 +448,7 @@ function renderSaved() {
         <div class="item-meta">${(l.ages || []).map(a => a + '세').join('·')}${l.editor_pick ? '　|　🏅 에디터 픽' : ''}</div>
       </div>
       <button class="btn btn-danger mini" data-rm>반에서 빼기</button>`;
-    div.querySelector('[data-prev]').addEventListener('click', () => window.open(l.url, '_blank', 'noopener,width=1100,height=750'));
+    div.querySelector('[data-prev]').addEventListener('click', () => openPlayPreview(l));
     div.querySelector('[data-rm]').addEventListener('click', async () => {
       const { error } = await sb.rpc('remove_from_class', { p_play: l.id, p_class: curClass });
       if (error) return alert('실패: ' + error.message);
@@ -504,7 +501,8 @@ function buildFormChips(selAges = [], selThemes = [], selTypes = [], selComps = 
   aBox.innerHTML = ''; tBox.innerHTML = ''; yBox.innerHTML = ''; cBox.innerHTML = ''; dBox.innerHTML = '';
   (settings.devices || []).forEach(d => dBox.appendChild(makeChip(d, selDevices.includes(d), d)));
   (settings.ages || []).forEach(a => aBox.appendChild(makeChip(a + '세', selAges.includes(a), a)));
-  (settings.themes || []).forEach(t => tBox.appendChild(makeChip(t, selThemes.includes(t), t)));
+  const normalizedThemes = selThemes.map(t => t === '생명과 우주' ? '지구와 우주' : t);
+  (settings.themes || []).forEach(t => tBox.appendChild(makeChip(t, normalizedThemes.includes(t), t)));
   (settings.types || []).forEach(t => yBox.appendChild(makeChip(t, selTypes.includes(t), t)));
   // 디지털 역량 칩 — 마우스를 올리면 쉬운 설명 (title 툴팁)
   (settings.competencies || []).forEach(c => {
@@ -514,21 +512,16 @@ function buildFormChips(selAges = [], selThemes = [], selTypes = [], selComps = 
   });
 }
 
-/* AI 리터러시 5요소 칩 (AI 활용 체크 시에만 표시) */
+/* AI 교육 5대 역량: 실제 AI 기능 사용 여부와 독립적으로 선택 */
 function buildAiChips(selElems = [], isAi = false) {
   const box = document.getElementById('fAiElems');
   box.innerHTML = '';
   (settings.ai_elements || []).forEach(e => {
-    const chip = makeChip(`${e.emoji || ''} ${e.name}`, selElems.includes(e.name), e.name);
+    const chip = makeChip(`${e.emoji || ''} ${aiLabel(e.name)}`, selElems.includes(e.name), e.name);
     chip.title = `${e.en}\n${e.desc}\n예: ${e.ex}`;
     box.appendChild(chip);
   });
-  document.getElementById('fIsAi').checked = isAi;
-  document.getElementById('aiElemBox').style.display = isAi ? 'block' : 'none';
 }
-document.getElementById('fIsAi').addEventListener('change', e => {
-  document.getElementById('aiElemBox').style.display = e.target.checked ? 'block' : 'none';
-});
 
 /* AI 리터러시 안내 팝업 */
 document.getElementById('aiGuideLink').addEventListener('click', e => {
@@ -536,14 +529,14 @@ document.getElementById('aiGuideLink').addEventListener('click', e => {
   const box = document.getElementById('compGuideList');
   box.innerHTML = (settings.ai_elements || []).map(c => `
     <div style="padding:11px 0; border-bottom:1px solid var(--line)">
-      <div style="font-size:14.5px; font-weight:600">${c.emoji || ''} ${esc(c.name)}
+      <div style="font-size:14.5px; font-weight:600">${c.emoji || ''} ${esc(aiLabel(c.name))}
         <span style="font-size:12px; font-weight:400; opacity:.5; margin-left:4px">${esc(c.en || '')}</span></div>
       <div style="font-size:13.5px; opacity:.8; margin-top:4px; line-height:1.7; word-break:keep-all">${esc(c.detail || c.desc || '')}</div>
       <div style="font-size:12.5px; margin-top:5px; background:var(--sky); border-radius:8px; padding:6px 10px; line-height:1.6; word-break:keep-all">💡 예: ${esc(c.ex || '')}</div>
     </div>`).join('');
-  document.getElementById('compGuideTitle').textContent = '🤖 유아 AI 리터러시 5요소';
-  document.getElementById('compGuideDesc').textContent = 'AI를 활용하는 놀이라면 어떤 리터러시 요소를 기르는지 태그해 주세요. 다른 선생님들이 목적에 맞게 찾을 수 있어요!';
-  document.getElementById('compGuideSource').textContent = '출처: OECD·유네스코 AI 역량 체계 기반 유아 AI 교육 자료(2026 교육부 디지털 선도교원 워크숍 전달연수)를 쉽게 풀어 쓴 것';
+  document.getElementById('compGuideTitle').textContent = '🌟 인간 중심 유아 AI 교육의 5대 핵심요소';
+  document.getElementById('compGuideDesc').textContent = '놀이에서 기를 수 있는 역량을 골라 주세요. AI 기능을 직접 사용하지 않는 놀이도 해당할 수 있어요.';
+  document.getElementById('compGuideSource').textContent = '출처: OECD·유네스코 AI 역량 체계 기반 유아 AI 교육 자료';
   document.getElementById('compGuideModal').classList.add('open');
 });
 
@@ -572,24 +565,6 @@ document.getElementById('descTplBtn').addEventListener('click', () => {
   box.focus();
 });
 
-/* 역량 안내 팝업 (모르는 선생님을 위한 한눈 설명) */
-document.getElementById('compGuideLink').addEventListener('click', e => {
-  e.preventDefault();
-  const box = document.getElementById('compGuideList');
-  box.innerHTML = (settings.competencies || []).map(c => `
-    <div style="padding:11px 0; border-bottom:1px solid var(--line)">
-      <div style="font-size:14.5px; font-weight:600">${c.emoji || ''} ${esc(c.name)}
-        <span style="font-size:12px; font-weight:400; opacity:.5; margin-left:4px">${esc(c.full || '')}</span></div>
-      <div style="font-size:13.5px; opacity:.8; margin-top:4px; line-height:1.7; word-break:keep-all">
-        ${esc(c.detail || c.desc || '')}</div>
-      <div style="font-size:12.5px; margin-top:5px; background:var(--sky); border-radius:8px; padding:6px 10px; line-height:1.6; word-break:keep-all">
-        💡 예: ${esc(c.ex || '')}</div>
-    </div>`).join('') || '<p class="empty">역량 목록을 불러오지 못했어요. 관리자 설정을 확인해 주세요.</p>';
-  document.getElementById('compGuideTitle').textContent = '🍿 유아 디지털 역량 6가지';
-  document.getElementById('compGuideDesc').textContent = '놀이를 등록할 때 해당하는 역량을 골라두면, 다른 선생님들이 역량별로 놀이를 찾을 수 있어요!';
-  document.getElementById('compGuideSource').textContent = '출처: 교육부·경기도교육청, 「유아의 균형 있는 디지털 역량을 기르기 위한 교육 자료」(현장지원자료)의 6개 하위 영역을 쉽게 풀어 쓴 것';
-  document.getElementById('compGuideModal').classList.add('open');
-});
 document.getElementById('compGuideClose').addEventListener('click', () =>
   document.getElementById('compGuideModal').classList.remove('open'));
 
@@ -636,6 +611,7 @@ document.getElementById('fThumb').addEventListener('change', e => {
 });
 
 function resetForm() {
+  previewForm.reset();
   editingId = null; thumbBlob = null;
   setCat('놀이');
   document.getElementById('formTitle').textContent = '새 놀이 등록';
@@ -658,6 +634,7 @@ function startEdit(id) {
   const l = plays.find(x => x.id === id);
   if (!l) return;
   editingId = id; thumbBlob = null;
+  previewForm.reset(l);
   setCat(l.category);
   document.getElementById('formTitle').textContent = l.category === '업무' ? '업무 링크 수정' : '놀이 수정';
   document.getElementById('saveBtn').textContent = '수정 저장';
@@ -702,7 +679,12 @@ async function save() {
   }
 
   btn.disabled = true; btn.textContent = '저장 중…';
+  let previewUpload = null;
+  let previewSaved = false;
+  const lockedControls = [...document.querySelectorAll('button,input,select,textarea')].map(el => [el, el.disabled]);
+  lockedControls.forEach(([el]) => { el.disabled = true; });
   try {
+    previewUpload = await previewForm.prepare(me.id, document.getElementById('fVis').value === 'pending');
     // 썸네일 업로드 (본인 폴더에만 업로드 가능 — Storage 정책)
     const prev = editingId ? plays.find(x => x.id === editingId) : null;
     let thumbUrl = prev ? (prev.thumb_url || null) : null;
@@ -721,12 +703,13 @@ async function save() {
       competencies: curCat === '놀이' ? [...document.querySelectorAll('#fComps .chip.on')].map(c => c.dataset.value) : [],
       devices: curCat === '놀이' ? [...document.querySelectorAll('#fDevices .chip.on')].map(c => c.dataset.value) : [],
       work_category: curCat === '업무' ? (document.querySelector('#fWorkCat .chip.on')?.dataset.value || null) : null,
-      is_ai: curCat === '놀이' ? document.getElementById('fIsAi').checked : false,
-      ai_elements: (curCat === '놀이' && document.getElementById('fIsAi').checked)
+      is_ai: prev ? !!prev.is_ai : false, // 기존 실제 AI 사용 정보는 보존하며 역량 선택과 연동하지 않음
+      ai_elements: curCat === '놀이'
         ? [...document.querySelectorAll('#fAiElems .chip.on')].map(c => c.dataset.value) : [],
       source: document.getElementById('fSource').value,
       description: document.getElementById('fDesc').value.trim() || null,
-      thumb_url: thumbUrl
+      thumb_url: thumbUrl,
+      ...previewUpload.values
     };
 
     if (editingId) {
@@ -735,12 +718,14 @@ async function save() {
       if (prev.visibility === 'pending' && visSel === 'private') row.visibility = 'private';
       const { error } = await sb.from('plays').update(row).eq('id', editingId);
       if (error) throw error;
+      previewSaved = true;
       msg.textContent = '수정했어요.';
     } else {
       row.owner_id = me.id;
       row.visibility = visSel;
       const { error } = await sb.from('plays').insert(row);
       if (error) throw error;
+      previewSaved = true;
       msg.textContent = visSel === 'pending'
         ? '등록 완료! 검수가 끝나면 공유 라이브러리에 팝! 터져요 🍿'
         : '등록했어요! 반별 선택에서 체크하면 태블릿에 보여요.';
@@ -752,9 +737,11 @@ async function save() {
     await loadPlays();
     renderList();
   } catch (e) {
+    if (previewUpload && !previewSaved) await previewUpload.rollback();
     msg.className = 'msg bad';
     msg.textContent = '저장에 실패했어요: ' + (e.message || e);
   }
+  lockedControls.forEach(([el, disabled]) => { el.disabled = disabled; });
   btn.disabled = false; btn.textContent = editingId ? '수정 저장' : '등록하기';
 }
 document.getElementById('saveBtn').addEventListener('click', save);
@@ -940,7 +927,7 @@ function renderList() {
         <div class="item-title">
           <span class="cat ${l.category === '놀이' ? 'play' : 'work'}">${l.category}</span>
           <span class="vis ${l.visibility}">${VIS_LABEL[l.visibility]}</span>
-          <span class="t-link" data-prev title="새 창에서 미리보기">${esc(l.title)} ↗</span>
+          <span class="t-link" data-prev title="놀이팝 안에서 미리보기">${esc(l.title)} ↗</span>
         </div>
         <div class="item-meta">${meta}</div>
       </div>
@@ -948,7 +935,7 @@ function renderList() {
       <button class="btn btn-ghost mini" data-edit="${l.id}">수정</button>
       <button class="btn btn-danger mini" data-del="${l.id}">삭제</button>
       ${reviewNote}`;
-    div.querySelector('[data-prev]').addEventListener('click', () => window.open(l.url, '_blank', 'noopener,width=1100,height=750'));
+    div.querySelector('[data-prev]').addEventListener('click', () => openPlayPreview(l));
     box.appendChild(div);
   });
 
