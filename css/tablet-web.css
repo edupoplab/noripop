@@ -32,3 +32,17 @@ body.playing .web-dock { display:none; }
 @media(max-width:600px) { .tablet-logo { width:140px; } .web-dock { gap:6px; } .web-dock button { padding:10px 12px; font-size:13px; } .class-tag { font-size:12px; padding:10px; } }
 body { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cellipse cx='22' cy='22' rx='11' ry='8' fill='none' stroke='%23F4E8CC' stroke-width='1.5'/%3E%3Cellipse cx='68' cy='66' rx='11' ry='8' fill='none' stroke='%23F4E8CC' stroke-width='1.5'/%3E%3C/svg%3E"); }
 .thumb-ph { color:#29425B; }
+/* Slim horizontal tablet navigation. Brand colors stay on the content. */
+.web-dock { gap:0; padding:6px max(12px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)); background:#FFFEFC; box-shadow:0 -2px 14px #40301405; }
+.web-dock button,.web-dock button:first-child { flex:1; max-width:240px; display:flex; align-items:center; justify-content:center; gap:9px; min-height:48px; padding:10px 12px; border-radius:9px; background:transparent; color:#526075; font-size:14px; font-weight:600; }
+.web-dock button svg { width:21px; height:21px; flex:none; }
+.web-dock #webHome { color:#293C56; font-weight:750; }
+.web-dock #webTeacher { border-left:1px solid #E8E4DC; border-radius:0; margin-left:10px; }
+.web-dock button:hover:not(:disabled),.web-dock button:active:not(:disabled) { background:#FFF3CF; }
+.web-dock button:focus-visible { outline:2px solid #CA9B24; outline-offset:-3px; }
+.web-dock button:disabled { opacity:.3; cursor:default; }
+body.playing .web-dock { display:flex; }
+html.native-app body.playing .web-dock { display:none; }
+html:not(.native-app) #player { bottom:calc(61px + env(safe-area-inset-bottom)); }
+html:not(.native-app) .player-controls { display:none; }
+@media(max-width:600px) { .web-dock button { font-size:11px; gap:4px; padding:8px 3px; } .web-dock button svg { width:17px; height:17px; } .web-dock #webTeacher { margin-left:3px; } }

@@ -154,7 +154,7 @@
     *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
   }
 </style>
-<link rel="stylesheet" href="css/tablet-web.css?v=20260926-1">
+<link rel="stylesheet" href="css/tablet-web.css?v=20260926-2">
 </head>
 <body>
 <header class="topbar">
@@ -206,16 +206,12 @@
 
 <button id="resetLink" class="utility">반 연결 해제</button>
 <button id="fsBtn" class="utility">⛶ 전체화면</button>
-<nav class="web-dock" aria-label="놀이팝 메뉴">
-  <button type="button" id="webHome">⌂ 놀이팝 홈</button>
-  <button type="button" id="webRefresh">↻ 새로고침</button>
-  <button type="button" id="webTeacher">⚙ 교사 설정</button>
-</nav>
+<nav class="web-dock" aria-label="놀이팝 메뉴"><button type="button" id="webBack" disabled><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span>뒤로</span></button><button type="button" id="webForward" disabled><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m10 6 6 6-6 6"/></svg><span>앞으로</span></button><button type="button" id="webHome"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg><span>놀이팝 홈</span></button><button type="button" id="webRefresh"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6 6a8 8 0 0 1 13 3M18 18A8 8 0 0 1 5 15"/></svg><span>새로고침</span></button><button type="button" id="webTeacher"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg><span>교사 설정</span></button></nav>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
 <script src="js/common.js?v=20260921-1"></script>
-<script src="js/tablet-teacher.js?v=20260926-1"></script>
+<script src="js/tablet-teacher.js?v=20260926-2"></script>
 <script>
 const PALETTE = ['#FFE5A0', '#CFEFE5', '#FFDBD6', '#E7DFF7', '#F9EABF'];
 const TOKEN_KEY = 'popTabletToken';
@@ -252,6 +248,11 @@ async function load() {
     }
     localStorage.setItem(TOKEN_KEY, token); // QR로 처음 왔어도 저장 → 다음부터 자동
     history.replaceState(null, '', location.pathname); // 주소창에서 토큰 감추기
+    if (!isNativeApp && !await TeacherWeb.ensureSetup()) {
+      grid.innerHTML = ''; stateMsg.hidden = false;
+      stateMsg.textContent = '선생님, 하단 교사 설정에서 PIN 설정을 마쳐 주세요.';
+      return;
+    }
     render(data.class_name, data.plays || []);
   } catch (e) {
     console.error(e);
@@ -292,6 +293,7 @@ function render(className, plays) {
 
 /* 내부 실행은 하단 조작 영역을 유지. 외부 실행은 웹 목록 탭을 보존한다. */
 function openPlay(l) {
+  if (!isNativeApp && !replaying) rememberView(l);
   if (!isNativeApp || l.open_mode === 'iframe') {
     currentPlayUrl = l.url;
     lastPlayCard = document.activeElement;
@@ -300,13 +302,14 @@ function openPlay(l) {
     document.getElementById('playerHelp').open = false;
     document.getElementById('player').classList.add('open');
     document.body.classList.add('playing');
-    document.getElementById(isNativeApp ? 'closeBtn' : 'playListBtn').focus();
+    document.getElementById(isNativeApp ? 'closeBtn' : 'webHome').focus();
     try { document.documentElement.requestFullscreen?.().catch(() => {}); } catch (e) {}
   } else {
     location.href = l.url;
   }
 }
 function closePlay() {
+  if (!isNativeApp && !replaying && currentPlayUrl) rememberView(null);
   document.body.classList.remove('playing');
   document.getElementById('player').classList.remove('open');
   document.getElementById('playerFrame').src = 'about:blank';
@@ -366,10 +369,33 @@ document.getElementById('resetLink').addEventListener('click', () => {
   location.reload();
 });
 
+// Own navigation history: never pretend to inspect cross-origin iframe history.
+const views = [null]; let viewIndex = 0; let replaying = false;
+function rememberView(play) {
+  views.splice(viewIndex + 1); views.push(play); viewIndex = views.length - 1;
+  updateNavigation();
+}
+function updateNavigation() {
+  document.getElementById('webBack').disabled = viewIndex === 0;
+  document.getElementById('webForward').disabled = viewIndex === views.length - 1;
+}
+function navigateView(delta) {
+  const next = viewIndex + delta;
+  if (next < 0 || next >= views.length) return;
+  viewIndex = next; replaying = true;
+  try { views[next] ? openPlay(views[next]) : closePlay(); }
+  finally { replaying = false; updateNavigation(); }
+}
+document.getElementById('webBack').onclick = () => navigateView(-1);
+document.getElementById('webForward').onclick = () => navigateView(1);
 document.getElementById('webHome').onclick = closePlay;
-document.getElementById('webRefresh').onclick = () => location.reload();
+document.getElementById('webRefresh').onclick = () => {
+  if (currentPlayUrl) document.getElementById('restartPlayBtn').click();
+  else location.reload();
+};
 document.getElementById('webTeacher').onclick = () => TeacherWeb.menu();
 load();
 </script>
 </body>
 </html>
+
