@@ -1,0 +1,13 @@
+.pop-name-dialog{width:min(440px,calc(100% - 32px));margin:auto;padding:28px;border:1px solid #f1dfba;border-radius:24px;background:#fffdf7;color:#1e3a5f;box-shadow:0 20px 70px #38281030;font-family:inherit}
+.pop-name-dialog::backdrop{background:#24304266;backdrop-filter:blur(3px)}
+.name-dialog-mark{font-size:28px;margin-bottom:10px}
+.pop-name-dialog h2{font-size:22px;margin:0 0 10px}
+.pop-name-dialog p{line-height:1.6;font-size:14px;margin:0 0 20px}
+.pop-name-dialog label{display:block;font-size:14px;font-weight:700;margin-bottom:8px}
+.pop-name-dialog input{width:100%;box-sizing:border-box;border:1px solid #decfae;border-radius:12px;padding:13px;font:inherit;color:inherit;background:white}
+.pop-name-dialog input:focus{outline:3px solid #ffcf4c66;border-color:#cf9800}
+.pop-name-dialog #popNameError{color:#ab362c;margin:8px 0;min-height:22px}
+.name-dialog-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}
+.name-dialog-actions button{padding:12px 23px;border:0;border-radius:12px;color:#1e3a5f;font:inherit;font-weight:700;cursor:pointer}
+.name-cancel{background:#f1eee6}.name-save{background:#ffcd38}
+.name-dialog-actions button:disabled{opacity:.55;cursor:wait}

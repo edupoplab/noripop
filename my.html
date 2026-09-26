@@ -124,6 +124,7 @@
 </style>
 <link rel="stylesheet" href="css/pop.css">
 <link rel="stylesheet" href="css/preview.css?v=20260921-1">
+<link rel="stylesheet" href="css/name-dialog.css?v=20260926-1">
 </head>
 <body>
 <div class="wrap">
@@ -226,7 +227,7 @@
 
     <!-- ════ 오른쪽: 내 놀이 + 모음별 선택 ════ -->
     <div class="panel">
-      <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px"><strong id="roomName"></strong><button class="btn btn-ghost mini" id="renameRoom">이름 변경</button></div>
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap"><strong id="roomName"></strong><button class="btn btn-ghost mini" id="renameRoom">반명 변경</button></div>
       <div class="board-head">
         <h2 style="margin:0">내 놀이 <span class="count" id="count"></span></h2>
         <select aria-label="놀이 모음" id="classSelect"><option value="">놀이 모음 선택…</option></select>
@@ -339,6 +340,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="js/config.js"></script>
 <script src="js/common.js?v=20260921-1"></script>
+<script src="js/name-dialog.js?v=20260926-1"></script>
 <script src="js/preview.js?v=20260921-1"></script>
 <script src="js/preview-form.js?v=20260921-domain"></script>
 <script>
@@ -409,7 +411,7 @@ async function loadPlays() {
 
 async function loadClasses() {
   const ensured=await sb.rpc('ensure_default_collection'); if(ensured.error)throw ensured.error;
-  document.getElementById('roomName').textContent='우리 반: '+(me.classroom_name || '우리 반');
+  renderRoomName();
   const { data, error } = await sb.from('classes').select('*')
     .eq('owner_id', me.id).order('created_at');
   if (error) throw error;
@@ -793,10 +795,17 @@ document.getElementById('classSelect').addEventListener('change', async e => {
 });
 
 
-document.getElementById('renameRoom').onclick=async()=>{
- const name=prompt('우리 반 이름',me.classroom_name || '우리 반');if(!name?.trim())return;
- const {error}=await sb.from('profiles').update({classroom_name:name.trim().slice(0,60)}).eq('id',me.id);
- if(error)return alert(error.message);me.classroom_name=name.trim().slice(0,60);document.getElementById('roomName').textContent='우리 반: '+me.classroom_name;
+function renderRoomName(){
+ const name=(me.classroom_name || '').trim();
+ document.getElementById('roomName').textContent='우리 반: '+(name && name!=='우리 반' ? name : '반명을 설정해주세요');
+}
+document.getElementById('renameRoom').onclick=()=>{
+ PopNameDialog.open({title:'반명 변경',label:'우리 반 이름',value:me.classroom_name==='우리 반'?'':me.classroom_name,
+ hint:'예: 햇살반 · 반명을 바꿔도 놀이 모음과 태블릿 연결은 그대로 유지돼요.',
+ async save(name){
+ const {error}=await sb.from('profiles').update({classroom_name:name}).eq('id',me.id);
+ if(error)throw error;me.classroom_name=name;renderRoomName();
+ }});
 };
 document.getElementById('manageCollection').onclick=async()=>{
  const c=classes.find(x=>x.id===curClass);if(!c)return;
