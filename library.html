@@ -118,7 +118,7 @@
 <!-- 반 선택 모달 -->
 <div class="modal" id="classModal">
   <div class="sheet">
-    <h3>어느 반에 담을까요?</h3>
+    <h3>어느 놀이 모음에 담을까요?</h3>
     <p id="pickTitle"></p>
     <div class="class-list" id="classList"></div>
     <div style="margin-top:14px; text-align:right">
@@ -336,7 +336,7 @@ function startSave(p) {
     return;
   }
   if (myClasses.length === 0) {
-    if (confirm('아직 만든 반이 없어요. 관리 페이지에서 반을 먼저 만들까요?')) location.href = 'my.html';
+    if (confirm('아직 놀이 모음이 없어요. 관리 페이지에서 기본 모음을 만들까요?')) location.href = 'my.html';
     return;
   }
   pickPlayId = p.id;

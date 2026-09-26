@@ -30,7 +30,7 @@ window.TeacherWeb = (() => {
   }
   async function verifyOwner(boundToken) {
     if(!boundToken) throw Error('먼저 우리 반을 연결해 주세요.');
-    return sheet('반을 만든 선생님 확인', '<p>이 반을 만든 놀이팝 계정으로 확인해 주세요. 비밀번호는 이 기기에 저장하지 않아요.</p><label>교사 계정 이메일<input name="email" type="email" autocomplete="off" required></label><label>놀이팝 로그인 비밀번호<input name="password" type="password" autocomplete="off" required></label>', async d=>{
+    return sheet('놀이 모음을 만든 선생님 확인', '<p>이 놀이 모음을 만든 놀이팝 계정으로 확인해 주세요. 비밀번호는 이 기기에 저장하지 않아요.</p><label>교사 계정 이메일<input name="email" type="email" autocomplete="off" required></label><label>놀이팝 로그인 비밀번호<input name="password" type="password" autocomplete="off" required></label>', async d=>{
       const client=window.supabase.createClient(POP_CONFIG.SUPABASE_URL,POP_CONFIG.SUPABASE_ANON_KEY,{
         auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false,storageKey:'pop-recovery-transient'},
         global:{fetch:async (url,options)=>{
@@ -43,13 +43,13 @@ window.TeacherWeb = (() => {
         const {data,error}=await client.auth.signInWithPassword({email:d.querySelector('[name=email]').value.trim(),password});
         if(error||!data.user) throw Error('이메일과 비밀번호를 확인해 주세요.');
         const result=await client.from('classes').select('id').eq('tablet_token',boundToken).eq('owner_id',data.user.id).limit(1);
-        if(result.error||!result.data?.length) throw Error('이 반을 만든 교사 계정으로 확인해 주세요.');
+        if(result.error||!result.data?.length) throw Error('이 놀이 모음을 만든 교사 계정으로 확인해 주세요.');
         return true;
       } finally {try {await client.auth.signOut({scope:'local'});}catch {}}
     });
   }
   async function setPin(boundToken) {
-    return sheet('교사 PIN 설정','<p>이 웹앱에서 사용할 숫자 4~8자리를 정해 주세요. 반 연결 번호나 APK의 PIN과는 별개예요. 잊으면 이 반의 교사 계정으로 복구할 수 있어요.</p><label>새 PIN<input name="pin" type="password" inputmode="numeric" pattern="[0-9]{4,8}" minlength="4" maxlength="8" required></label><label>새 PIN 다시 입력<input name="repeat" type="password" inputmode="numeric" minlength="4" maxlength="8" required></label>',async d=>{
+    return sheet('교사 PIN 설정','<p>이 웹앱에서 사용할 숫자 4~8자리를 정해 주세요. 모음 연결 번호나 APK의 PIN과는 별개예요. 잊으면 이 놀이 모음의 교사 계정으로 복구할 수 있어요.</p><label>새 PIN<input name="pin" type="password" inputmode="numeric" pattern="[0-9]{4,8}" minlength="4" maxlength="8" required></label><label>새 PIN 다시 입력<input name="repeat" type="password" inputmode="numeric" minlength="4" maxlength="8" required></label>',async d=>{
       const pin=d.querySelector('[name=pin]').value;
       if(!/^\d{4,8}$/.test(pin)||pin!==d.querySelector('[name=repeat]').value) throw Error('같은 숫자 4~8자리를 두 번 입력해 주세요.');
       const salt=Array.from(crypto.getRandomValues(new Uint8Array(16)),x=>x.toString(16).padStart(2,'0')).join('');
@@ -58,7 +58,7 @@ window.TeacherWeb = (() => {
   }
   async function unlock() {
     const saved=read();
-    if(!saved){const bound=localStorage.getItem('popTabletToken'); if(await verifyOwner(bound))return setPin(bound);return false;}
+    if(!saved){const bound=localStorage.getItem('popTabletToken'); if(!bound)throw Error('먼저 놀이 모음을 연결해 주세요.'); return setPin(bound);}
     const ok=await sheet('교사 PIN 입력','<label>숫자 4~8자리<input name="pin" type="password" inputmode="numeric" maxlength="8" required></label><button type="button" data-recover>PIN을 잊었나요?</button>',async d=>{
       const current=read();
       if(Date.now()<current.until)throw Error('입력을 여러 번 틀렸어요. 1분 후 다시 시도해 주세요.');
@@ -78,21 +78,19 @@ window.TeacherWeb = (() => {
       const firstSetup=!read();
       if(!await unlock())return;
       if(firstSetup){location.reload();return;}
-      await sheet('교사 설정','<p>PIN은 이 브라우저에 저장돼요. 사이트 데이터를 지우면 PIN도 초기화됩니다.</p><button type="button" data-class>우리 반 연결·변경</button><button type="button" data-change>PIN 변경</button><button type="button" data-disconnect>반 연결 해제</button><p>카메라·마이크 권한은 브라우저 또는 기기 설정에서 변경할 수 있어요.</p>',()=>true);
+      await sheet('교사 설정','<p>PIN은 이 브라우저에 저장돼요. 사이트 데이터를 지우면 PIN도 초기화됩니다.</p><button type="button" data-class>놀이 모음 연결·변경</button><button type="button" data-change>PIN 변경</button><button type="button" data-disconnect>모음 연결 해제</button><p>카메라·마이크 권한은 브라우저 또는 기기 설정에서 변경할 수 있어요.</p>',()=>true);
     }catch(err){alert(err.message || '교사 설정을 열지 못했어요.');}
   }
   document.addEventListener('click',async e=>{
     if(e.target.matches('[data-class]')) {
       e.target.closest('dialog').close();
       try {
-        const next=await sheet('우리 반 연결·변경','<p>새 반의 연결 번호를 입력해 주세요. 다음 화면에서 그 반을 만든 교사 계정을 확인합니다.</p><label>반 연결 번호 (숫자 6자리)<input name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required></label>',async d=>{
+        const next=await sheet('놀이 모음 연결·변경','<p>연결할 놀이 모음의 8자리 번호를 입력해 주세요.</p><label>모음 연결 번호 (숫자 8자리)<input name="code" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" required></label>',async d=>{
           const code=d.querySelector('[name=code]').value;
-          if(!/^\d{6}$/.test(code))throw Error('숫자 6자리를 입력해 주세요.');
-          const {data,error}=await sb.rpc('connect_class',{p_code:'POP-'+code});
-          if(error||!data?.[0]?.tablet_token)throw Error('반 연결 번호를 확인해 주세요.');
-          return data[0].tablet_token;
+          if(!/^\d{8}$/.test(code))throw Error('숫자 8자리를 입력해 주세요.');
+          return PopConnection.connect(code);
         });
-        if(next && await verifyOwner(next)) {
+        if(next) {
           save({...read(),boundToken:next});
           localStorage.setItem('popTabletToken',next);
           location.href=location.pathname;
@@ -100,14 +98,14 @@ window.TeacherWeb = (() => {
       }catch(err){alert(err.message||'반을 변경하지 못했어요.');}
     }
     if(e.target.matches('[data-change]')){const bound=read()?.boundToken;e.target.closest('dialog').close();try{await setPin(bound);}catch(err){alert(err.message);}}
-    if(e.target.matches('[data-disconnect]')&&confirm('반 연결을 해제할까요? 새 반 연결 시 교사 확인과 PIN을 다시 설정합니다.')){localStorage.removeItem('popTabletToken');localStorage.removeItem(KEY);location.href=location.pathname;}
+    if(e.target.matches('[data-disconnect]')&&confirm('반 연결을 해제할까요? 다시 연결하면 PIN을 새로 설정합니다.')){localStorage.removeItem('popTabletToken');localStorage.removeItem(KEY);location.href=location.pathname;}
   });
   async function allowConnection(nextToken){
     if(/NoriPopKiosk\//.test(navigator.userAgent))return true;
     const saved=read();if(!saved||saved.boundToken===nextToken)return true;
     if(!await unlock())return false;
-    // Verify ownership of the new class before replacing recovery binding.
-    if(!await verifyOwner(nextToken))return false;
+    // Existing PIN authorizes switching to a QR-linked collection.
+
     save({...read(),boundToken:nextToken});return true;
   }
   async function ensureSetup(){return read() ? true : unlock();}

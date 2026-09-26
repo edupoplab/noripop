@@ -224,16 +224,18 @@
       </div>
     </div>
 
-    <!-- ════ 오른쪽: 내 놀이 + 반별 선택 ════ -->
+    <!-- ════ 오른쪽: 내 놀이 + 모음별 선택 ════ -->
     <div class="panel">
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px"><strong id="roomName"></strong><button class="btn btn-ghost mini" id="renameRoom">이름 변경</button></div>
       <div class="board-head">
         <h2 style="margin:0">내 놀이 <span class="count" id="count"></span></h2>
-        <select id="classSelect"><option value="">반 선택…</option></select>
-        <button type="button" class="btn btn-ghost mini" id="addClassBtn">+ 반 추가</button>
+        <select aria-label="놀이 모음" id="classSelect"><option value="">놀이 모음 선택…</option></select>
+        <button type="button" class="btn btn-ghost mini" id="addClassBtn">+ 모음 만들기</button>
+        <button type="button" class="btn btn-ghost mini" id="manageCollection">모음 설정</button>
         <button type="button" class="btn btn-ghost mini" id="classInfoBtn" disabled>📱 태블릿 연결</button>
         <button type="button" class="btn mini save-sel" id="saveSelBtn" disabled>선택 저장</button>
       </div>
-      <p class="sticky-note">반을 선택하면 체크박스가 나타나요. 체크한 놀이만 그 반 태블릿에 보여요.</p>
+      <p class="sticky-note">체크한 놀이가 선택한 모음에 담겨요. 이 모음에 연결한 태블릿에 함께 보여요.</p>
 
       <details class="pop-fold">
       <summary>🔍 필터 열기</summary>
@@ -254,30 +256,28 @@
       <!-- 공유 라이브러리에서 담아온 남의 놀이 (반 선택 시 표시) -->
       <div id="savedSection" style="display:none; border-top: 1px dashed var(--line); margin-top: 14px; padding-top: 14px;">
         <h2 style="font-size:16px">🍿 담아온 놀이 <span class="count" id="savedCount"></span></h2>
-        <p class="sticky-note">공유 라이브러리에서 이 반에 담은 놀이예요. 태블릿에 함께 보여요.</p>
+        <p class="sticky-note">공유 라이브러리에서 이 모음에 담은 놀이예요. 태블릿에 함께 보여요.</p>
         <div id="savedList"></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- 태블릿 연결 모달 (QR + 반 코드) -->
+<!-- 태블릿 연결 모달 (QR + 모음 연결 번호) -->
 <div class="modal" id="classModal">
   <div class="sheet">
     <h3 id="cmTitle">📱 태블릿 연결</h3>
     <p style="font-size:13.5px; line-height:1.7; opacity:.75">
       방법 ① 태블릿 카메라로 아래 <b>QR을 찍으면</b> 바로 열려요.<br>
-      방법 ② 태블릿에서 놀이팝 유아 화면을 열고 <b>반 코드</b>를 입력해요.<br>
-      열린 뒤 브라우저 메뉴의 "설치" 또는 "홈 화면에 추가"로 설치해 주세요. 청록색 팝콘 아이콘이 웹앱이에요.
+      방법 ② 태블릿에서 놀이팝 유아 화면을 열고 <b>8자리 모음 연결 번호</b>를 입력해요.<br>
+      PIN 설정 후 설치 안내의 설치 버튼 또는 브라우저 메뉴의 "설치" 또는 "홈 화면에 추가"로 설치해 주세요. 청록색 팝콘 아이콘이 웹앱이에요.
     </p>
     <div class="qr-box" id="qrBox"></div>
     <details style="margin:14px 0;line-height:1.7;font-size:13px">
       <summary style="cursor:pointer;font-weight:700">🔐 교사 PIN은 어디에 있나요?</summary>
-      <p>반 연결 코드(POP-숫자 6자리)는 놀이 목록을 불러오는 번호예요. <b>교사 PIN은 별도로 정하는 숫자 4~8자리</b>이며, 홈페이지에서 조회할 수 없어요.</p>
-      <p><b>웹앱:</b> 놀이 목록 하단의 ‘교사 설정’에서 반을 만든 교사 계정으로 확인하고 PIN을 정해요. 잊었다면 ‘PIN을 잊었나요?’에서 같은 계정으로 새 번호를 설정해요. APK 앱의 PIN과는 별개이며, 브라우저 데이터를 지우면 초기화돼요.</p>
-      <p>안드로이드 놀이팝 앱 하단의 <b>🍿 놀이팝 홈 버튼을 길게 누르면</b> 교사 설정이 열려요. PIN 변경과 앱 권한을 여기에서 관리해요.</p>
-      <p><b>PIN을 잊었다면:</b> 앱 0.1.10 이상에서 ‘PIN을 잊었나요?’를 누르고 복구용 반을 만든 교사 계정으로 확인한 뒤 새 번호를 정해요.</p>
-      <p>기존 앱을 업데이트한 선생님은 반을 연결한 상태에서 <b>기존 PIN으로 교사 모드를 한 번 열어</b> 복구용 반을 등록해 주세요. 복구용 반을 등록하기 전에 PIN을 잊으면 계정으로 재설정할 수 없어요.</p>
+      <p>반 연결 코드(POP-숫자 8자리)는 놀이 목록을 불러오는 번호예요. <b>교사 PIN은 별도로 정하는 숫자 4~8자리</b>이며, 홈페이지에서 조회할 수 없어요.</p>
+      <p><b>웹앱:</b> QR로 연결하거나 8자리 연결 번호를 입력한 뒤 최초 교사 PIN을 정해요. 계정 로그인은 필요 없어요. 잊었다면 ‘PIN을 잊었나요?’에서 같은 계정으로 새 번호를 설정해요. APK 앱의 PIN과는 별개이며, 브라우저 데이터를 지우면 초기화돼요.</p>
+      <p><b>PIN 복구:</b> ‘PIN을 잊었나요?’를 누르고 이 놀이 모음을 만든 교사 이메일·비밀번호로 확인한 뒤 새 PIN을 정해요. 계정 확인은 복구 때만 필요해요.</p>
     </details>
     <div class="code-big" id="cmCode"></div>
     <div class="btn-row">
@@ -408,19 +408,24 @@ async function loadPlays() {
 }
 
 async function loadClasses() {
+  const ensured=await sb.rpc('ensure_default_collection'); if(ensured.error)throw ensured.error;
+  document.getElementById('roomName').textContent='우리 반: '+(me.classroom_name || '우리 반');
   const { data, error } = await sb.from('classes').select('*')
     .eq('owner_id', me.id).order('created_at');
   if (error) throw error;
   classes = data || [];
   const sel = document.getElementById('classSelect');
   const keep = curClass;
-  sel.innerHTML = '<option value="">반 선택…</option>';
+  sel.innerHTML = '<option value="">놀이 모음 선택…</option>';
   classes.forEach(c => {
     const o = document.createElement('option');
     o.value = c.id; o.textContent = c.name;
     sel.appendChild(o);
   });
-  if (keep && classes.some(c => c.id === keep)) sel.value = keep;
+  sel.value = keep && classes.some(c => c.id === keep) ? keep : (classes[0]?.id || '');
+  curClass=sel.value; document.getElementById('classInfoBtn').disabled=!curClass;
+  if(curClass)await loadChecked(curClass);
+  updateSaveBtn();
 }
 
 async function loadChecked(classId) {
@@ -473,7 +478,7 @@ function setCat(cat) {
   document.getElementById('playOnly').style.display = cat === '놀이' ? 'block' : 'none';
   document.getElementById('workOnly').style.display = cat === '업무' ? 'block' : 'none';
   document.getElementById('catNote').textContent = cat === '놀이'
-    ? '놀이는 유아 태블릿에 노출돼요. 반별 선택에서 체크하면 그 반에 보여요.'
+    ? '놀이는 유아 태블릿에 노출돼요. 모음별 선택에서 체크하면 연결한 태블릿에 보여요.'
     : '업무 링크는 유아 화면에 나가지 않아요.';
   document.getElementById('descReq').textContent = cat === '놀이' ? '(필수)' : '(선택)';
   // 탭 전환 시: 비어 있거나 반대쪽 양식 그대로면 현재 탭의 양식으로 교체
@@ -736,7 +741,7 @@ async function save() {
       previewSaved = true;
       msg.textContent = visSel === 'pending'
         ? '등록 완료! 검수가 끝나면 공유 라이브러리에 팝! 터져요 🍿'
-        : '등록했어요! 반별 선택에서 체크하면 태블릿에 보여요.';
+        : '등록했어요! 모음별 선택에서 체크하면 태블릿에 보여요.';
       me = await loadMyProfile(me.id); // 등록 점수 반영
       renderTopbar();
     }
@@ -756,7 +761,7 @@ document.getElementById('saveBtn').addEventListener('click', save);
 
 async function delPlay(id) {
   const l = plays.find(x => x.id === id);
-  if (!confirm(`"${l ? l.title : ''}" 링크를 삭제할까요?\n반별 선택에서도 함께 빠집니다.`)) return;
+  if (!confirm(`"${l ? l.title : ''}" 링크를 삭제할까요?\n모음별 선택에서도 함께 빠집니다.`)) return;
   const { error } = await sb.from('plays').delete().eq('id', id);
   if (error) return alert('삭제 실패: ' + error.message);
   checked.delete(id);
@@ -775,7 +780,7 @@ async function unpublish(id) {
 
 /* ───── 반 관리 ───── */
 document.getElementById('classSelect').addEventListener('change', async e => {
-  if (dirty && !confirm('저장하지 않은 선택이 있어요. 반을 바꾸면 사라집니다. 계속할까요?')) {
+  if (dirty && !confirm('저장하지 않은 선택이 있어요. 모음을 바꾸면 사라집니다. 계속할까요?')) {
     e.target.value = curClass; return;
   }
   curClass = e.target.value;
@@ -787,11 +792,32 @@ document.getElementById('classSelect').addEventListener('change', async e => {
   renderList();
 });
 
+
+document.getElementById('renameRoom').onclick=async()=>{
+ const name=prompt('우리 반 이름',me.classroom_name || '우리 반');if(!name?.trim())return;
+ const {error}=await sb.from('profiles').update({classroom_name:name.trim().slice(0,60)}).eq('id',me.id);
+ if(error)return alert(error.message);me.classroom_name=name.trim().slice(0,60);document.getElementById('roomName').textContent='우리 반: '+me.classroom_name;
+};
+document.getElementById('manageCollection').onclick=async()=>{
+ const c=classes.find(x=>x.id===curClass);if(!c)return;
+ if(dirty&&!confirm('저장하지 않은 놀이 선택이 있어요. 모음 설정을 계속할까요?'))return;
+ const action=prompt('1: 모음 이름 변경 / 2: 모음 삭제','1');
+ if(action==='1'){
+ const name=prompt('놀이 모음 이름',c.name);if(!name?.trim())return;
+ const {error}=await sb.from('classes').update({name:name.trim().slice(0,60)}).eq('id',c.id);if(error)return alert(error.message);
+ }else if(action==='2'){
+ if(classes.length<=1)return alert('기본으로 사용할 모음 하나는 남겨 주세요.');
+ if(!confirm('이 모음을 삭제할까요? 등록한 놀이 원본은 남지만 이 모음의 태블릿 연결은 해제돼요.'))return;
+ const {error}=await sb.from('classes').delete().eq('id',c.id);if(error)return alert(error.message);curClass='';
+ }else return;
+ await loadClasses();renderList();
+};
+
 document.getElementById('addClassBtn').addEventListener('click', async () => {
-  const name = prompt('추가할 반 이름을 입력하세요 (예: 햇님반)');
+  const name = prompt('놀이 모음 이름을 입력하세요 (예: 언어놀이)');
   if (!name || !name.trim()) return;
   const { data, error } = await sb.from('classes').insert({ owner_id: me.id, name: name.trim() }).select().single();
-  if (error) return alert('반 추가 실패: ' + error.message);
+  if (error) return alert('모음 만들기 실패: ' + error.message);
   await loadClasses();
   document.getElementById('classSelect').value = data.id;
   curClass = data.id;

@@ -154,7 +154,7 @@
     *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
   }
 </style>
-<link rel="stylesheet" href="css/tablet-web.css?v=20260926-2">
+<link rel="stylesheet" href="css/tablet-web.css?v=20260926-3">
 </head>
 <body>
 <header class="topbar">
@@ -176,16 +176,16 @@
 <div id="connect">
   <div class="c-sheet">
     <div class="connect-mark">P!</div>
-    <h2>우리 반 연결하기</h2>
-    <p>선생님 관리 페이지에 있는 <b>반 코드</b>를 입력해 주세요.<br>한 번만 하면 다음부터는 바로 놀이가 보여요.</p>
+    <h2>놀이 모음 연결하기</h2>
+    <p>선생님 관리 페이지에 있는 <b>모음 연결 번호</b>를 입력해 주세요.<br>한 번만 하면 다음부터는 바로 놀이가 보여요.</p>
     <div class="code-field">
       <span class="code-prefix" aria-hidden="true">POP-</span>
-      <input class="code-input" id="codeInput" placeholder="000000" maxlength="6"
-             inputmode="numeric" pattern="[0-9]*" autocomplete="off" aria-label="반 코드 숫자 6자리">
+      <input class="code-input" id="codeInput" placeholder="00000000" maxlength="8"
+             inputmode="numeric" pattern="[0-9]*" autocomplete="off" aria-label="모음 연결 번호 숫자 8자리">
     </div>
     <button class="c-btn" id="codeBtn">연결하기</button>
     <div class="c-err" id="codeErr">코드를 찾을 수 없어요. 다시 확인해 주세요.</div>
-    <p class="c-note">QR로 연결했다면 이 화면은 나오지 않아요.<br>반 코드는 관리 페이지 → 반 관리에서 볼 수 있어요.</p>
+    <p class="c-note">QR로 연결했다면 이 화면은 나오지 않아요.<br>모음 연결 번호는 교사 관리 → 놀이 모음 선택 → 태블릿 연결에서 볼 수 있어요.</p>
   </div>
 </div>
 
@@ -211,7 +211,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
 <script src="js/common.js?v=20260921-1"></script>
-<script src="js/tablet-teacher.js?v=20260926-2"></script>
+<script src="js/tablet-connection.js?v=20260926-3"></script>
+<script src="js/tablet-install.js?v=20260926-3"></script>
+<script src="js/tablet-teacher.js?v=20260926-3"></script>
 <script>
 const PALETTE = ['#FFE5A0', '#CFEFE5', '#FFDBD6', '#E7DFF7', '#F9EABF'];
 const TOKEN_KEY = 'popTabletToken';
@@ -234,17 +236,17 @@ async function load() {
     return;
   }
   try {
-    if (!await TeacherWeb.allowConnection(token)) {
-      token = localStorage.getItem(TOKEN_KEY) || '';
-      history.replaceState(null, '', location.pathname);
-      return token ? load() : location.reload();
-    }
     const { data, error } = await sb.rpc('tablet_data', { p_token: token });
     if (error) throw error;
     if (!data) { // 토큰이 유효하지 않음 (반이 삭제된 경우 등)
       localStorage.removeItem(TOKEN_KEY);
       token = '';
       return load();
+    }
+    if (!await TeacherWeb.allowConnection(token)) {
+      token = localStorage.getItem(TOKEN_KEY) || '';
+      history.replaceState(null, '', location.pathname);
+      return token ? load() : location.reload();
     }
     localStorage.setItem(TOKEN_KEY, token); // QR로 처음 왔어도 저장 → 다음부터 자동
     history.replaceState(null, '', location.pathname); // 주소창에서 토큰 감추기
@@ -254,6 +256,7 @@ async function load() {
       return;
     }
     render(data.class_name, data.plays || []);
+    window.PopInstall?.offer();
   } catch (e) {
     console.error(e);
     stateMsg.textContent = '놀이를 불러오지 못했어요. 선생님을 불러주세요!';
@@ -326,32 +329,29 @@ document.getElementById('restartPlayBtn').addEventListener('click', () => {
   }
 });
 
-/* 반 코드로 연결 */
+/* 모음 연결 번호로 연결 */
 async function connectByCode() {
-  const digits = document.getElementById('codeInput').value.replace(/\D/g, '').slice(0, 6);
+  const digits = document.getElementById('codeInput').value.replace(/\D/g, '').slice(0, 8);
   const code = 'POP-' + digits;
   const err = document.getElementById('codeErr');
   err.style.display = 'none';
-  if (digits.length !== 6) {
-    err.textContent = '숫자 6자리를 입력해 주세요.';
+  if (digits.length !== 8) {
+    err.textContent = '숫자 8자리를 입력해 주세요.';
     err.style.display = 'block';
     return;
   }
   try {
-    const { data, error } = await sb.rpc('connect_class', { p_code: code });
-    if (error) throw error;
-    if (!data || data.length === 0) { err.style.display = 'block'; return; }
-    token = data[0].tablet_token;
+    token = await PopConnection.connect(digits);
     document.getElementById('connect').classList.remove('open');
     load();
   } catch (e) {
-    err.textContent = '연결에 문제가 있어요. 인터넷을 확인해 주세요.';
+    err.textContent = e.message || '연결에 문제가 있어요. 인터넷을 확인해 주세요.';
     err.style.display = 'block';
   }
 }
 document.getElementById('codeBtn').addEventListener('click', connectByCode);
 document.getElementById('codeInput').addEventListener('input', e => {
-  e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
+  e.target.value = e.target.value.replace(/\D/g, '').slice(0, 8);
 });
 document.getElementById('codeInput').addEventListener('keydown', e => { if (e.key === 'Enter') connectByCode(); });
 
