@@ -30,7 +30,7 @@ window.TeacherWeb = (() => {
   }
   async function verifyOwner(boundToken) {
     if(!boundToken) throw Error('먼저 우리 반을 연결해 주세요.');
-    return sheet('놀이 모음을 만든 선생님 확인', '<p>이 놀이 모음을 만든 놀이팝 계정으로 확인해 주세요. 비밀번호는 이 기기에 저장하지 않아요.</p><label>교사 계정 이메일<input name="email" type="email" autocomplete="off" required></label><label>놀이팝 로그인 비밀번호<input name="password" type="password" autocomplete="off" required></label>', async d=>{
+    return sheet('놀이 모음을 만든 선생님 확인', '<p>이 놀이 모음을 만든 놀이팝 계정으로 확인해 주세요. 비밀번호는 이 기기에 저장하지 않아요.</p><p><a href="reset-password.html" target="_blank" rel="noopener">계정 비밀번호를 잊었나요?</a><br>변경 후 이 화면으로 돌아와 새 비밀번호로 확인해 주세요.</p><label>교사 계정 이메일<input name="email" type="email" autocomplete="off" required></label><label>놀이팝 로그인 비밀번호<input name="password" type="password" autocomplete="off" required></label>', async d=>{
       const client=window.supabase.createClient(POP_CONFIG.SUPABASE_URL,POP_CONFIG.SUPABASE_ANON_KEY,{
         auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false,storageKey:'pop-recovery-transient'},
         global:{fetch:async (url,options)=>{

@@ -1,5 +1,16 @@
 /* 이름 입력 전용 대화상자. 저장 실패 시 입력을 유지한다. */
 window.PopNameDialog = {
+ choose(title,message,choices=[{label:'확인',value:true}]) {
+  return new Promise(resolve=>{
+   const previous=document.activeElement,d=document.createElement('dialog');d.className='pop-name-dialog';
+   const h=document.createElement('h2');h.textContent=title;const p=document.createElement('p');p.textContent=message;
+   const actions=document.createElement('div');actions.className='name-dialog-actions';
+   d.append(h,p,actions);d.setAttribute('aria-label',title);
+   const finish=value=>{d.close();d.remove();previous?.focus();resolve(value);};
+   for(const [i,choice] of choices.entries()){const b=document.createElement('button');b.textContent=choice.label;b.className=i===choices.length-1?'name-save':'name-cancel';b.onclick=()=>finish(choice.value);actions.appendChild(b);}
+   d.addEventListener('cancel',e=>{e.preventDefault();finish(null);});document.body.appendChild(d);d.showModal();
+  });
+ },
  open({title,label,value='',hint='',save}) {
   if(document.getElementById('popNameDialog'))return;
   const previous=document.activeElement;
