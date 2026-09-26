@@ -112,6 +112,10 @@
   .player-controls button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
   html:not(.native-app) #closeBtn { display: none; }
   html.native-app .player-controls { display: none; }
+  .player-help { background: #fff; color: var(--muted); text-align: center; font-size: 12px; padding: 6px 12px; }
+  .player-help summary { cursor: pointer; }
+  .player-help a { display: inline-block; padding: 8px; color: var(--blue-deep); }
+  html.native-app .player-help { display: none; }
   #closeBtn {
     position: absolute; top: 12px; right: 12px; z-index: 110; width: 56px; height: 56px;
     border-radius: 18px; background: var(--coral); color: #fff; border: 3px solid #fff;
@@ -189,6 +193,11 @@
 <div id="player">
   <button id="closeBtn" aria-label="놀이 닫기">✕</button>
   <iframe id="playerFrame" title="놀이 화면" allow="autoplay; camera; microphone; fullscreen"></iframe>
+  <details class="player-help" id="playerHelp">
+    <summary>놀이 화면이 나오지 않나요?</summary>
+    <p>내부 실행을 지원하지 않는 사이트는 새 탭으로 열어 주세요. 이 탭에 놀이 목록이 남아 있어요.</p>
+    <a id="externalPlayLink" target="_blank" rel="noopener noreferrer">새 탭에서 열기</a>
+  </details>
   <nav class="player-controls" aria-label="놀이 이동">
     <button type="button" id="playListBtn">⌂ 놀이 목록으로</button>
     <button type="button" id="restartPlayBtn">↻ 다시 시작</button>
@@ -272,23 +281,24 @@ function render(className, plays) {
 
 /* 내부 실행은 하단 조작 영역을 유지. 외부 실행은 웹 목록 탭을 보존한다. */
 function openPlay(l) {
-  if (l.open_mode === 'iframe') {
+  if (!isNativeApp || l.open_mode === 'iframe') {
     currentPlayUrl = l.url;
     lastPlayCard = document.activeElement;
     document.getElementById('playerFrame').src = currentPlayUrl;
+    document.getElementById('externalPlayLink').href = currentPlayUrl;
+    document.getElementById('playerHelp').open = false;
     document.getElementById('player').classList.add('open');
     document.getElementById(isNativeApp ? 'closeBtn' : 'playListBtn').focus();
     try { document.documentElement.requestFullscreen?.().catch(() => {}); } catch (e) {}
-  } else if (isNativeApp) {
-    location.href = l.url;
   } else {
-    window.open(l.url, '_blank', 'noopener,noreferrer');
+    location.href = l.url;
   }
 }
 function closePlay() {
   document.getElementById('player').classList.remove('open');
   document.getElementById('playerFrame').src = 'about:blank';
   currentPlayUrl = '';
+  document.getElementById('externalPlayLink').removeAttribute('href');
   lastPlayCard?.focus();
   try { if (document.fullscreenElement) document.exitFullscreen().catch(() => {}); } catch (e) {}
 }
