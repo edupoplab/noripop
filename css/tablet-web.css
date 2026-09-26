@@ -1,0 +1,34 @@
+:root { --blue:#FFC933; --blue-deep:#8C5900; }
+body { background:#FFFAF0; }
+.topbar { padding:20px 28px 14px; }
+.tablet-logo { width:180px; height:auto; display:block; }
+.header-sub { margin-top:8px; }
+.class-tag { background:#FFF0BD; color:#67491F; }
+.card { border:1px solid #F3E9D7; }
+.card:hover { box-shadow:0 12px 26px #80602218; }
+.card:focus-visible { outline-color:#E8AF16; }
+.thumb-wrap::after { background:#FFCD39; color:#263B54; }
+.c-btn,.connect-mark { background:#FFCD39; color:#263B54; box-shadow:none; }
+.state::before { background:#FFF0BD; color:#936400; }
+main { padding-bottom:105px; }
+.player-controls button:first-child { background:#FFCD39; color:#263B54; }
+.player-controls button { background:#FFF4D8; }
+.web-dock { position:fixed; bottom:0; left:0; right:0; z-index:120; display:flex; gap:12px; align-items:center; justify-content:center; padding:10px 16px calc(10px + env(safe-area-inset-bottom)); background:#FFFEFA; border-top:1px solid #EFE4CC; }
+.web-dock button { border:0; border-radius:14px; min-height:48px; padding:10px 24px; background:#FFF1C6; color:#253B58; font-weight:800; cursor:pointer; }
+.web-dock button:first-child { background:#FFCD39; }
+html.native-app .web-dock { display:none; }
+html:not(.native-app) #resetLink,html:not(.native-app) #fsBtn { display:none; }
+body.playing .web-dock { display:none; }
+.teacher-sheet { border:0; border-radius:24px; padding:28px; width:calc(100% - 32px); max-width:440px; margin:auto; color:#253B58; box-shadow:0 20px 80px #0003; }
+.teacher-sheet::backdrop { background:#20304780; }
+.teacher-sheet h2 { font-size:22px; margin-bottom:14px; }
+.teacher-sheet p { line-height:1.7; margin:12px 0; font-size:14px; }
+.teacher-sheet label { display:block; font-size:14px; margin-top:14px; }
+.teacher-sheet input { width:100%; padding:13px; border:1px solid #DDD4BF; border-radius:12px; margin-top:6px; }
+.teacher-sheet button { width:100%; padding:13px; border:0; border-radius:12px; background:#FFF0BD; color:#253B58; font-weight:750; margin-top:12px; cursor:pointer; }
+.teacher-sheet button[type=submit] { background:#FFCD39; }
+.teacher-sheet .teacher-error { color:#B23928; min-height:22px; }
+.teacher-sheet button:disabled { opacity:.55; cursor:wait; }
+@media(max-width:600px) { .tablet-logo { width:140px; } .web-dock { gap:6px; } .web-dock button { padding:10px 12px; font-size:13px; } .class-tag { font-size:12px; padding:10px; } }
+body { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cellipse cx='22' cy='22' rx='11' ry='8' fill='none' stroke='%23F4E8CC' stroke-width='1.5'/%3E%3Cellipse cx='68' cy='66' rx='11' ry='8' fill='none' stroke='%23F4E8CC' stroke-width='1.5'/%3E%3C/svg%3E"); }
+.thumb-ph { color:#29425B; }
