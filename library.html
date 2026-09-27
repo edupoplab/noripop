@@ -198,11 +198,12 @@ async function loadItems() {
   const { data: plays, error } = await sb.from('plays').select(cols)
     .eq('visibility', 'public').order('created_at', { ascending: false });
   if (error) throw error;
-  // 작성자 닉네임·레벨 (공개 뷰)
+  // 작성자 닉네임·레벨 (공개 필드만 돌려주는 전용 함수)
   const ownerIds = [...new Set((plays || []).map(p => p.owner_id))];
   let owners = {};
   if (ownerIds.length) {
-    const { data: profs } = await sb.from('public_profiles').select('*').in('id', ownerIds);
+    const { data: profs, error: profileError } = await sb.rpc('public_profiles_for', { p_ids: ownerIds });
+    if (profileError) throw profileError;
     (profs || []).forEach(p => owners[p.id] = p);
   }
   items = (plays || []).map(p => ({ ...p, owner: owners[p.owner_id] || { nickname: '?', points: 0 } }));
