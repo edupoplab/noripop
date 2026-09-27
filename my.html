@@ -269,15 +269,15 @@
   <div class="sheet">
     <h3 id="cmTitle">📱 태블릿 연결</h3>
     <p style="font-size:13.5px; line-height:1.7; opacity:.75">
-      방법 ① 태블릿 카메라로 아래 <b>QR을 찍으면</b> 바로 열려요.<br>
-      방법 ② 태블릿에서 놀이팝 유아 화면을 열고 <b>8자리 모음 연결 번호</b>를 입력해요.<br>
+      방법 ① 태블릿 카메라로 아래 <b>QR을 찍어</b> 놀이팝 유아 화면을 열어요.<br>
+      방법 ② 열린 화면에 아래 <b>8자리 모음 연결 번호</b>를 입력해요.<br>
       PIN 설정 후 설치 안내의 설치 버튼 또는 브라우저 메뉴의 "설치" 또는 "홈 화면에 추가"로 설치해 주세요. 청록색 팝콘 아이콘이 웹앱이에요.
     </p>
     <div class="qr-box" id="qrBox"></div>
     <details style="margin:14px 0;line-height:1.7;font-size:13px">
       <summary style="cursor:pointer;font-weight:700">🔐 교사 PIN은 어디에 있나요?</summary>
-      <p>반 연결 코드(POP-숫자 8자리)는 놀이 목록을 불러오는 번호예요. <b>교사 PIN은 별도로 정하는 숫자 4~8자리</b>이며, 홈페이지에서 조회할 수 없어요.</p>
-      <p><b>웹앱:</b> QR로 연결하거나 8자리 연결 번호를 입력한 뒤 최초 교사 PIN을 정해요. 계정 로그인은 필요 없어요. 잊었다면 ‘PIN을 잊었나요?’에서 같은 계정으로 새 번호를 설정해요. APK 앱의 PIN과는 별개이며, 브라우저 데이터를 지우면 초기화돼요.</p>
+      <p>모음 연결 번호(POP-숫자 8자리)는 놀이 목록을 불러오는 번호예요. <b>교사 PIN은 별도로 정하는 숫자 4~8자리</b>이며, 홈페이지에서 조회할 수 없어요.</p>
+      <p><b>웹앱:</b> QR로 화면을 연 뒤 8자리 연결 번호를 입력하고 최초 교사 PIN을 정해요. 계정 로그인은 필요 없어요. 잊었다면 ‘PIN을 잊었나요?’에서 같은 계정으로 새 번호를 설정해요. APK 앱의 PIN과는 별개이며, 브라우저 데이터를 지우면 초기화돼요.</p>
       <p><b>PIN 복구:</b> ‘PIN을 잊었나요?’를 누르고 이 놀이 모음을 만든 교사 이메일·비밀번호로 확인한 뒤 새 PIN을 정해요. 계정 확인은 복구 때만 필요해요.</p>
     </details>
     <div class="code-big" id="cmCode"></div>
@@ -869,7 +869,9 @@ function openClassModal() {
   if (!c) return;
   document.getElementById('cmTitle').textContent = `📱 ${c.name} 태블릿 연결`;
   document.getElementById('cmCode').textContent = c.connect_code;
-  const url = new URL('tablet.html', location.href).href + '?c=' + c.tablet_token;
+  const setupUrl = new URL('tablet.html', location.href);
+  setupUrl.searchParams.set('setup', '1');
+  const url = setupUrl.href;
   const box = document.getElementById('qrBox');
   box.innerHTML = '';
   new QRCode(box, { text: url, width: 180, height: 180, colorDark: '#1E3A5F' });

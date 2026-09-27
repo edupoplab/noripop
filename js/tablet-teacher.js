@@ -29,7 +29,7 @@ window.TeacherWeb = (() => {
     });
   }
   async function verifyOwner(boundToken) {
-    if(!boundToken) throw Error('먼저 우리 반을 연결해 주세요.');
+    if(!boundToken) throw Error('먼저 놀이 모음을 연결해 주세요.');
     return sheet('놀이 모음을 만든 선생님 확인', '<p>이 놀이 모음을 만든 놀이팝 계정으로 확인해 주세요. 비밀번호는 이 기기에 저장하지 않아요.</p><p><a href="reset-password.html" target="_blank" rel="noopener">계정 비밀번호를 잊었나요?</a><br>변경 후 이 화면으로 돌아와 새 비밀번호로 확인해 주세요.</p><label>교사 계정 이메일<input name="email" type="email" autocomplete="off" required></label><label>놀이팝 로그인 비밀번호<input name="password" type="password" autocomplete="off" required></label>', async d=>{
       const client=window.supabase.createClient(POP_CONFIG.SUPABASE_URL,POP_CONFIG.SUPABASE_ANON_KEY,{
         auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false,storageKey:'pop-recovery-transient'},
@@ -95,16 +95,16 @@ window.TeacherWeb = (() => {
           localStorage.setItem('popTabletToken',next);
           location.href=location.pathname;
         }
-      }catch(err){alert(err.message||'반을 변경하지 못했어요.');}
+      }catch(err){alert(err.message||'놀이 모음을 변경하지 못했어요.');}
     }
     if(e.target.matches('[data-change]')){const bound=read()?.boundToken;e.target.closest('dialog').close();try{await setPin(bound);}catch(err){alert(err.message);}}
-    if(e.target.matches('[data-disconnect]')&&confirm('반 연결을 해제할까요? 다시 연결하면 PIN을 새로 설정합니다.')){localStorage.removeItem('popTabletToken');localStorage.removeItem(KEY);location.href=location.pathname;}
+    if(e.target.matches('[data-disconnect]')&&confirm('놀이 모음 연결을 해제할까요? 다시 연결하면 PIN을 새로 설정합니다.')){localStorage.removeItem('popTabletToken');localStorage.removeItem(KEY);location.href=location.pathname;}
   });
   async function allowConnection(nextToken){
     if(/NoriPopKiosk\//.test(navigator.userAgent))return true;
     const saved=read();if(!saved||saved.boundToken===nextToken)return true;
     if(!await unlock())return false;
-    // Existing PIN authorizes switching to a QR-linked collection.
+    // Existing PIN authorizes switching to another collection.
 
     save({...read(),boundToken:nextToken});return true;
   }
