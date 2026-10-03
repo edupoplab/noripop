@@ -361,7 +361,9 @@ async function doSave(cls) {
     if (error) throw error;
     toast(data === 'own'
       ? `내 놀이를 ${cls.name}에 담았어요!`
-      : `${cls.name}에 담았어요! 만든 선생님에게 팝콘이 터졌어요 🍿`);
+      : data === 'first_save'
+        ? `${cls.name}에 담았어요! 만든 선생님에게 팝콘이 터졌어요 🍿`
+        : `${cls.name}에 담았어요! 이미 담은 놀이여서 팝콘은 추가 적립되지 않아요.`);
     await loadItems(); render(); // 담김 수 갱신
   } catch (e) {
     alert(e.message || '담기에 실패했어요.');

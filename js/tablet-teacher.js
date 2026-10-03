@@ -1,7 +1,18 @@
 /* Web-only child setting guard. Account passwords and sessions are never persisted. */
 window.TeacherWeb = (() => {
   const KEY = 'popWebTeacherV1';
-  const read = () => JSON.parse(localStorage.getItem(KEY) || 'null');
+  const read = () => {
+    const raw = localStorage.getItem(KEY);
+    if (raw === null) return null;
+    try {
+      const v = JSON.parse(raw);
+      if (v && /^[a-f0-9]{32}$/.test(v.salt) && /^[a-f0-9]{64}$/.test(v.hash) &&
+          typeof v.boundToken === 'string' && v.boundToken.length > 0 &&
+          Number.isInteger(v.failures) && v.failures >= 0 && v.failures < 5 &&
+          Number.isFinite(v.until) && v.until >= 0) return v;
+    } catch {}
+    return {corrupt:true}; // Never turn damaged protection into a fresh, unprotected setup.
+  };
   const save = value => localStorage.setItem(KEY, JSON.stringify(value));
   const bytes = text => new TextEncoder().encode(text);
   async function digest(pin, salt) {
@@ -58,9 +69,15 @@ window.TeacherWeb = (() => {
   }
   async function unlock() {
     const saved=read();
+    if(saved?.corrupt){
+      const bound=localStorage.getItem('popTabletToken');
+      if(!await verifyOwner(bound))return false;
+      return setPin(bound);
+    }
     if(!saved){const bound=localStorage.getItem('popTabletToken'); if(!bound)throw Error('먼저 놀이 모음을 연결해 주세요.'); return setPin(bound);}
     const ok=await sheet('교사 PIN 입력','<label>숫자 4~8자리<input name="pin" type="password" inputmode="numeric" maxlength="8" required></label><button type="button" data-recover>PIN을 잊었나요?</button>',async d=>{
       const current=read();
+      if(!current || current.corrupt)throw Error('PIN 정보가 변경되었어요. 닫고 교사 설정에서 계정 확인 후 복구해 주세요.');
       if(Date.now()<current.until)throw Error('입력을 여러 번 틀렸어요. 1분 후 다시 시도해 주세요.');
       if(await digest(d.querySelector('[name=pin]').value,current.salt)!==current.hash){current.failures=(current.failures||0)+1;if(current.failures>=5){current.until=Date.now()+60000;current.failures=0;}save(current);throw Error('PIN이 맞지 않아요.');}
       save({...current,failures:0,until:0});return true;
@@ -75,7 +92,8 @@ window.TeacherWeb = (() => {
   });
   async function menu() {
     try{
-      const firstSetup=!read();
+      const saved=read();
+      const firstSetup=!saved || saved.corrupt;
       if(!await unlock())return;
       if(firstSetup){location.reload();return;}
       await sheet('교사 설정','<p>PIN은 이 브라우저에 저장돼요. 사이트 데이터를 지우면 PIN도 초기화됩니다.</p><button type="button" data-class>놀이 모음 연결·변경</button><button type="button" data-change>PIN 변경</button><button type="button" data-disconnect>모음 연결 해제</button><p>카메라·마이크 권한은 브라우저 또는 기기 설정에서 변경할 수 있어요.</p>',()=>true);
@@ -108,7 +126,7 @@ window.TeacherWeb = (() => {
 
     save({...read(),boundToken:nextToken});return true;
   }
-  async function ensureSetup(){return read() ? true : unlock();}
+  async function ensureSetup(){const saved=read();return saved && !saved.corrupt ? true : unlock();}
   return {menu,allowConnection,ensureSetup};
 })();
 

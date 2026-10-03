@@ -339,7 +339,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="js/config.js"></script>
-<script src="js/common.js?v=20260921-1"></script>
+<script src="js/common.js?v=20261003-1"></script>
 <script src="js/name-dialog.js?v=20260926-2"></script>
 <script src="js/preview.js?v=20260921-1"></script>
 <script src="js/preview-form.js?v=20260921-domain"></script>
@@ -675,9 +675,11 @@ async function save() {
   const msg = document.getElementById('formMsg');
   const btn = document.getElementById('saveBtn');
   const title = document.getElementById('fTitle').value.trim();
-  const url = document.getElementById('fUrl').value.trim();
+  const rawUrl = document.getElementById('fUrl').value.trim();
+  const url = safePlayUrl(rawUrl);
   const ages = curCat === '놀이' ? [...document.querySelectorAll('#fAges .chip.on')].map(c => c.dataset.value) : [];
-  if (!title || !url) { msg.className = 'msg bad'; msg.textContent = '이름과 링크는 꼭 입력해 주세요.'; return; }
+  if (!title || !rawUrl) { msg.className = 'msg bad'; msg.textContent = '이름과 링크는 꼭 입력해 주세요.'; return; }
+  if (!url) { msg.className = 'msg bad'; msg.textContent = '링크는 https://로 시작하는 올바른 주소를 입력해 주세요. 주소에 계정 정보나 공백은 넣을 수 없어요.'; return; }
   if (curCat === '놀이' && ages.length === 0) { msg.className = 'msg bad'; msg.textContent = '놀이는 연령을 하나 이상 선택해 주세요.'; return; }
   // 주제·유형 필수 (라이브러리 검색 품질을 위해)
   if (curCat === '놀이' && document.querySelectorAll('#fThemes .chip.on').length === 0) {
@@ -748,8 +750,9 @@ async function save() {
       me = await loadMyProfile(me.id); // 등록 점수 반영
       renderTopbar();
     }
-    msg.className = 'msg ok';
     resetForm();
+    // resetForm hides stale notices; show this completed operation afterwards.
+    msg.className = 'msg ok';
     await loadPlays();
     renderList();
   } catch (e) {
@@ -1070,5 +1073,6 @@ document.getElementById('withdrawBtn').addEventListener('click', async () => {
 
 document.getElementById('logoutBtn').addEventListener('click', logout);
 </script>
+<script src="js/support.js?v=20261003-1"></script>
 </body>
 </html>

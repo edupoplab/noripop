@@ -208,10 +208,10 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
-<script src="js/common.js?v=20260921-1"></script>
+<script src="js/common.js?v=20261003-1"></script>
 <script src="js/tablet-connection.js?v=20260928-1"></script>
 <script src="js/tablet-install.js?v=20260926-4"></script>
-<script src="js/tablet-teacher.js?v=20260928-1"></script>
+<script src="js/tablet-teacher.js?v=20261003-1"></script>
 <script>
 const PALETTE = ['#FFE5A0', '#CFEFE5', '#FFDBD6', '#E7DFF7', '#F9EABF'];
 const TOKEN_KEY = 'popTabletToken';
@@ -248,7 +248,9 @@ async function load() {
     if (!await TeacherWeb.allowConnection(token)) {
       token = localStorage.getItem(TOKEN_KEY) || '';
       history.replaceState(null, '', location.pathname);
-      return token ? load() : location.reload();
+      grid.innerHTML = ''; stateMsg.hidden = false;
+      stateMsg.textContent = '선생님, 하단 교사 설정에서 PIN 확인 또는 복구를 마쳐 주세요.';
+      return;
     }
     localStorage.setItem(TOKEN_KEY, token); // 8자리 번호 검증 후 저장 → 다음부터 자동
     history.replaceState(null, '', location.pathname);
@@ -298,9 +300,15 @@ function render(className, plays) {
 
 /* 내부 실행은 하단 조작 영역을 유지. 외부 실행은 웹 목록 탭을 보존한다. */
 function openPlay(l) {
+  const safeUrl = safePlayUrl(l.url);
+  if (!safeUrl) {
+    stateMsg.hidden = false;
+    stateMsg.textContent = '실행할 수 없는 놀이 주소예요. 선생님이 https:// 주소로 수정해 주세요.';
+    return;
+  }
   if (!isNativeApp && !replaying) rememberView(l);
   if (!isNativeApp || l.open_mode === 'iframe') {
-    currentPlayUrl = l.url;
+    currentPlayUrl = safeUrl;
     lastPlayCard = document.activeElement;
     document.getElementById('playerFrame').src = currentPlayUrl;
     document.getElementById('externalPlayLink').href = currentPlayUrl;
@@ -310,7 +318,7 @@ function openPlay(l) {
     document.getElementById(isNativeApp ? 'closeBtn' : 'webHome').focus();
     try { document.documentElement.requestFullscreen?.().catch(() => {}); } catch (e) {}
   } else {
-    location.href = l.url;
+    location.href = safeUrl;
   }
 }
 function closePlay() {
@@ -332,9 +340,10 @@ document.getElementById('restartPlayBtn').addEventListener('click', () => {
 });
 
 /* 모음 연결 번호로 연결 */
+let connecting = false;
 async function connectByCode() {
+  if (connecting) return;
   const digits = document.getElementById('codeInput').value.replace(/\D/g, '').slice(0, 8);
-  const code = 'POP-' + digits;
   const err = document.getElementById('codeErr');
   err.style.display = 'none';
   if (digits.length !== 8) {
@@ -342,13 +351,18 @@ async function connectByCode() {
     err.style.display = 'block';
     return;
   }
+  const btn = document.getElementById('codeBtn');
+  const label = btn.textContent;
+  connecting = true; btn.disabled = true; btn.textContent = '연결 중…';
   try {
     token = await PopConnection.connect(digits);
     document.getElementById('connect').classList.remove('open');
-    load();
+    await load();
   } catch (e) {
     err.textContent = e.message || '연결에 문제가 있어요. 인터넷을 확인해 주세요.';
     err.style.display = 'block';
+  } finally {
+    connecting = false; btn.disabled = false; btn.textContent = label;
   }
 }
 document.getElementById('codeBtn').addEventListener('click', connectByCode);

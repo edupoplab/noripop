@@ -6,6 +6,15 @@
 // Supabase 클라이언트 (supabase-js v2 CDN이 먼저 로드돼 있어야 함)
 const sb = window.supabase.createClient(POP_CONFIG.SUPABASE_URL, POP_CONFIG.SUPABASE_ANON_KEY);
 
+// Only absolute HTTPS play addresses; never execute URL schemes as code.
+function safePlayUrl(value) {
+  if (typeof value !== 'string' || !/^https:\/\//i.test(value.trim()) || /[\u0000-\u0020\u007f]/.test(value.trim())) return null;
+  try {
+    const url = new URL(value.trim());
+    return url.protocol === 'https:' && url.hostname && !url.username && !url.password ? url.href : null;
+  } catch { return null; }
+}
+
 // HTML 이스케이프 (XSS 방지 — 사용자 입력을 화면에 넣을 때 항상 사용)
 function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
