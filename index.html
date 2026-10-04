@@ -373,8 +373,8 @@ const PALETTE = ['#6ED3BF', '#FFC93C', '#FF7B6B', '#8FB8F6', '#C9A0F0'];
   }
 
   try {
-    const { data: notices } = await sb.from('announcements').select('*')
-      .order('created_at', { ascending: false }).limit(3);
+    const { data: notices, error: noticeError } = await sb.rpc('public_announcements');
+    if (noticeError) throw noticeError;
     if (notices && notices.length) {
       document.getElementById('noticeSection').style.display = 'block';
       document.getElementById('noticeList').innerHTML = notices.map(n =>

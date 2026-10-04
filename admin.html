@@ -71,6 +71,11 @@
   .set-row { display: flex; gap: 10px; align-items: center; margin: 8px 0; flex-wrap: wrap; }
   .set-row .k { width: 220px; font-size: 13.5px; }
   .set-row input { width: 130px; }
+  #tab-notice input[type=datetime-local] {max-width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;font:inherit;color:inherit;}
+  #tab-notice .notice-body {font-size:14px;margin-top:8px;white-space:pre-wrap;overflow-wrap:anywhere;}
+  #tab-notice .item-info {min-width:0;width:100%;}
+  #tab-notice .item-title {overflow-wrap:anywhere;}
+  #tab-notice [hidden] {display:none!important;}
 </style>
 <link rel="stylesheet" href="css/pop.css">
 <link rel="stylesheet" href="css/preview.css?v=20260921-1">
@@ -147,13 +152,24 @@
 
   <!-- 공지 -->
   <div class="panel" id="tab-notice" style="display:none">
-    <h2>공지 작성</h2>
-    <label>제목</label><input type="text" id="ntTitle" style="width:100%">
-    <label>내용</label><textarea id="ntBody" rows="4"></textarea>
-    <div style="margin-top:12px"><button class="btn btn-primary mini" id="ntSave">공지 올리기</button></div>
-    <div class="msg" id="ntMsg"></div>
-    <h2 style="margin-top:20px">지난 공지</h2>
-    <div id="ntList"></div>
+    <h2 id="ntHeading">공지 작성</h2>
+    <p class="checklist">공개로 설정한 공지만 게시 기간에 맞춰 홈페이지에 표시됩니다. 삭제한 공지는 휴지통에서 복원할 수 있습니다.</p>
+    <form id="ntForm">
+      <label for="ntTitle">제목</label><input type="text" id="ntTitle" maxlength="200" required style="width:100%">
+      <label for="ntBody">내용</label><textarea id="ntBody" rows="5" maxlength="10000" required></textarea>
+      <label><input type="checkbox" id="ntPublished" checked> 공개 (해제하면 숨김)</label>
+      <div class="row-btns">
+        <div><label for="ntStart">게시 시작 · 한국시간</label><input type="datetime-local" id="ntStart"></div>
+        <div><label for="ntEnd">게시 종료 · 한국시간</label><input type="datetime-local" id="ntEnd"></div>
+      </div>
+      <p class="item-meta">시작을 비우면 즉시 게시, 종료를 비우면 기간 제한 없이 게시합니다. 홈페이지에는 공개 중인 최신 공지 3개가 표시됩니다.</p>
+      <div class="row-btns" style="margin-top:16px"><button class="btn btn-primary mini" id="ntSave" type="submit">공지 올리기</button><button class="btn btn-ghost mini" id="ntCancel" type="button" hidden>수정 취소</button></div>
+    </form>
+    <div class="msg" id="ntMsg" role="status" aria-live="polite"></div>
+    <h2 style="margin-top:28px">공지 관리</h2>
+    <div class="row-btns"><label for="ntView">목록</label><select id="ntView"><option value="active">전체 공지</option><option value="trash">휴지통</option></select><button class="btn btn-ghost mini" id="ntRefresh">새로고침</button></div>
+    <div id="ntList" aria-live="polite"></div>
+    <div class="row-btns" style="margin-top:16px"><button class="btn btn-ghost mini" id="ntPrev" disabled>이전</button><span id="ntPage"></span><button class="btn btn-ghost mini" id="ntNext" disabled>다음</button></div>
   </div>
 
   <!-- 정책 설정 -->
@@ -454,26 +470,8 @@ async function loadRequests() {
   });
 }
 
-/* ───── 공지 ───── */
-document.getElementById('ntSave').addEventListener('click', async () => {
-  const title = document.getElementById('ntTitle').value.trim();
-  const body = document.getElementById('ntBody').value.trim();
-  const msg = document.getElementById('ntMsg');
-  if (!title || !body) { msg.className = 'msg bad'; msg.textContent = '제목과 내용을 입력해 주세요.'; return; }
-  const { error } = await sb.from('announcements').insert({ title, body });
-  msg.className = error ? 'msg bad' : 'msg ok';
-  msg.textContent = error ? error.message : '공지를 올렸어요!';
-  if (!error) { document.getElementById('ntTitle').value = ''; document.getElementById('ntBody').value = ''; loadNotices(); }
-});
-async function loadNotices() {
-  const { data } = await sb.from('announcements').select('*').order('created_at', { ascending: false }).limit(20);
-  document.getElementById('ntList').innerHTML = (data || []).map(n =>
-    `<div class="item"><div class="item-info">
-      <div class="item-title">${esc(n.title)}</div>
-      <div class="item-meta">${new Date(n.created_at).toLocaleDateString('ko-KR')}</div>
-      <div style="font-size:13.5px; margin-top:4px; white-space:pre-wrap">${esc(n.body)}</div>
-    </div></div>`).join('') || '<p class="empty">공지가 없어요.</p>';
-}
+/* ───── 공지: 관리 로직은 공통 모듈에서 처리 ───── */
+async function loadNotices() { return NoticeAdmin.load(); }
 
 /* ───── 정책 설정 ───── */
 function renderSettings() {
@@ -525,6 +523,8 @@ document.getElementById('setSave').addEventListener('click', async () => {
   }
 });
 </script>
+<script src="js/notice-rules.js?v=20261004-1"></script>
+<script src="js/notice-admin.js?v=20261004-1"></script>
 <script src="js/support.js?v=20261004-2"></script>
 </body>
 </html>
