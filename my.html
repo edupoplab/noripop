@@ -125,6 +125,7 @@
 <link rel="stylesheet" href="css/pop.css">
 <link rel="stylesheet" href="css/preview.css?v=20260921-1">
 <link rel="stylesheet" href="css/name-dialog.css?v=20260926-1">
+<link rel="stylesheet" href="css/account.css?v=20261004-1">
 </head>
 <body>
 <div class="wrap">
@@ -300,39 +301,39 @@
 </div>
 
 <!-- 마이페이지 모달 -->
-<div class="modal" id="passModal">
-  <div class="sheet">
-    <h3>👤 마이페이지</h3>
-    <div class="code-big" id="pmStatus"></div>
-    <div style="text-align:center; font-size:13.5px; opacity:.75; margin:-4px 0 8px" id="pmLevel"></div>
-
-    <label for="pmNick">닉네임</label>
-    <div style="display:flex; gap:8px">
-      <input type="text" id="pmNick" maxlength="12" style="flex:1">
-      <button class="btn btn-ghost mini" id="pmNickSave">변경</button>
+<div class="modal" id="passModal" role="dialog" aria-modal="true" aria-labelledby="pmTitle">
+  <div class="sheet account-sheet">
+    <header class="account-header"><h2 id="pmTitle">마이페이지</h2><button class="btn btn-ghost mini" id="pmClose" aria-label="마이페이지 닫기">닫기 ✕</button></header>
+    <div class="account-tabs" role="tablist" aria-label="마이페이지 메뉴">
+      <button id="pmTab-info" role="tab" aria-selected="true" aria-controls="pmPanel-info" data-account-tab="info">내 정보</button>
+      <button id="pmTab-pass" role="tab" aria-selected="false" aria-controls="pmPanel-pass" tabindex="-1" data-account-tab="pass">플러스 이용권</button>
+      <button id="pmTab-help" role="tab" aria-selected="false" aria-controls="pmPanel-help" tabindex="-1" data-account-tab="help">도움말</button>
     </div>
-    <div class="msg" id="pmNickMsg"></div>
-
-    <label for="pmCode">이용권 코드 입력</label>
-    <div style="display:flex; gap:8px">
-      <input type="text" id="pmCode" placeholder="POP-XXXX-XXXX" style="flex:1">
-      <button class="btn btn-primary mini" id="pmRedeem">등록</button>
+    <div class="account-body">
+      <div id="pmRefreshMsg" class="msg" role="status"></div><button id="pmRefresh" class="btn btn-ghost mini" hidden>계정 정보 다시 불러오기</button>
+      <section id="pmPanel-info" role="tabpanel" aria-labelledby="pmTab-info">
+        <div class="account-card"><h3>기본 정보</h3>
+          <label>로그인 이메일</label><p id="pmEmail" class="account-value">확인 중…</p>
+          <p class="account-hint">이메일은 로그인에 사용하는 계정 정보입니다. 변경이 필요한 경우 고객센터로 문의해 주세요.</p>
+          <label for="pmNick">닉네임</label><div class="account-row"><input type="text" id="pmNick" maxlength="12" autocomplete="nickname"><button class="btn btn-ghost mini" id="pmNickSave">변경</button></div>
+          <div class="msg" id="pmNickMsg" role="status"></div><p id="pmJoined" class="account-hint"></p>
+          <div class="account-actions"><a class="btn btn-ghost mini" href="reset-password.html" target="_blank" rel="noopener noreferrer">비밀번호 재설정 ↗</a></div>
+          <p class="account-hint">새 창에서 가입 이메일로 재설정 링크를 요청할 수 있어요. 태블릿 교사 PIN과 계정 비밀번호는 별개입니다.</p>
+        </div>
+        <div class="account-card"><h3>나의 활동</h3><p id="pmLevel" class="account-value"></p><p class="account-hint">활동 점수는 팝콘 레벨을 위한 점수입니다. 플러스 이용기간이나 결제 금액과는 달라요.</p></div>
+        <div class="account-card"><h3>계정 관리</h3><p class="account-hint">회원 탈퇴 시 계정과 등록 자료가 삭제됩니다. 진행 전 필요한 자료를 확인해 주세요.</p><button id="withdrawBtn" class="account-danger">회원 탈퇴</button></div>
+      </section>
+      <section id="pmPanel-pass" role="tabpanel" aria-labelledby="pmTab-pass" hidden>
+        <div class="account-card"><div class="account-summary"><p id="pmStatus"></p><p id="pmExpiry"></p><p class="account-hint">가입 혜택·놀이 공유·이용권 등록으로 받은 이용기간을 확인하세요.</p></div>
+          <h3>이용권 코드 등록</h3><label for="pmCode">이용권 코드</label><div class="account-row"><input type="text" id="pmCode" placeholder="POP-XXXX-XXXX" maxlength="64" autocomplete="off"><button class="btn btn-primary mini" id="pmRedeem">등록</button></div><div class="msg" id="pmMsg" role="status"></div>
+        </div>
+        <div class="account-card"><h3>이용기간 적립·조정 내역</h3><p class="account-hint">최근 5개부터 표시합니다. 더 보기를 누르면 이전 내역이 추가됩니다.</p><div id="pmEvents" aria-live="polite"></div><div id="pmEventsMsg" class="msg" role="status"></div><div class="account-actions"><button id="pmEventsRetry" class="btn btn-ghost mini" hidden>다시 시도</button><button id="pmEventsMore" class="btn btn-ghost mini" hidden>이전 내역 더 보기</button></div></div>
+      </section>
+      <section id="pmPanel-help" role="tabpanel" aria-labelledby="pmTab-help" hidden>
+        <div class="account-card"><h3>이용 중 도움이 필요하신가요?</h3><p class="account-hint">로그인·태블릿 연결·서비스 이용 문의는 고객센터로 보내 주세요.</p><div class="account-actions"><a class="btn btn-primary mini" href="https://pf.kakao.com/_xbVUxiX/chat" target="_blank" rel="noopener noreferrer">카카오톡 채널 상담하기 ↗</a><a class="btn btn-ghost mini" href="index.html#videoSection" target="_blank" rel="noopener noreferrer">이용방법 보기 ↗</a></div><p class="account-hint">비밀번호·인증번호와 아이의 개인정보는 보내지 마세요.</p></div>
+        <div class="account-card"><h3>기능·콘텐츠 제안</h3><label for="reqContent">놀이팝에 바라는 점</label><textarea id="reqContent" rows="4" maxlength="2000" placeholder="예: 전통놀이 주제를 추가해 주세요."></textarea><p class="account-hint">제안은 검토 후 개선에 참고합니다. 개별 상담은 카카오톡 채널을 이용해 주세요.</p><div class="msg" id="reqMsg" role="status"></div><div class="account-actions"><button class="btn btn-ghost" id="reqSend">제안 보내기</button></div></div>
+      </section>
     </div>
-    <div class="msg" id="pmMsg"></div>
-
-    <h3 style="margin-top:20px">적립 내역</h3>
-    <div id="pmEvents"></div>
-
-    <h3 style="margin-top:20px">✉️ 관리자에게 요청</h3>
-    <textarea id="reqContent" rows="2" placeholder="예: '전통놀이' 주제를 추가해 주세요"></textarea>
-    <div class="msg" id="reqMsg"></div>
-    <div class="btn-row">
-      <button class="btn btn-ghost" id="reqSend" style="flex:1">요청 보내기</button>
-      <button class="btn btn-primary" id="pmClose" style="flex:1">닫기</button>
-    </div>
-    <p style="text-align:center; margin-top:16px">
-      <button id="withdrawBtn" style="background:none; border:none; font-size:12px; color:#C94F3D; opacity:.6; cursor:pointer; text-decoration:underline">회원 탈퇴</button>
-    </p>
   </div>
 </div>
 
@@ -992,72 +993,7 @@ function renderList() {
   box.querySelectorAll('[data-unpub]').forEach(b => b.addEventListener('click', () => unpublish(b.dataset.unpub)));
 }
 
-/* ───── 이용권·적립 모달 ───── */
-const KIND_LABEL = { founding: '🎉 오픈 멤버 증정', contribute: '🍿 공개 놀이 적립', editor_pick: '🏅 에디터 픽', code: '🎟️ 이용권 코드', admin: '⚙️ 관리자 조정' };
-document.getElementById('passBtn').addEventListener('click', async () => {
-  const plus = isPlusDate(me.plus_expires_at);
-  document.getElementById('pmStatus').textContent = plus
-    ? `플러스 · ${fmtDate(me.plus_expires_at)}까지`
-    : '무료 회원';
-  const lv = levelOf(me.points, settings.level_thresholds);
-  document.getElementById('pmLevel').textContent = `${lv.emoji || '🍿'} ${lv.name} · ${me.points}점 · 가입일 ${fmtDate(me.created_at)}`;
-  document.getElementById('pmNick').value = me.nickname;
-  const { data } = await sb.from('pass_events').select('*').eq('user_id', me.id).order('created_at', { ascending: false });
-  const box = document.getElementById('pmEvents');
-  box.innerHTML = (data && data.length)
-    ? data.map(ev => `<div class="pass-row"><span>${KIND_LABEL[ev.kind] || ev.kind} <span style="opacity:.5;font-size:12px">${fmtDate(ev.created_at)}</span></span><span class="pass-days">+${ev.days}일</span></div>`).join('')
-    : '<p class="empty">아직 내역이 없어요.</p>';
-  document.getElementById('passModal').classList.add('open');
-});
-document.getElementById('pmClose').addEventListener('click', () => document.getElementById('passModal').classList.remove('open'));
-
-/* 이용권 코드 등록 */
-document.getElementById('pmRedeem').addEventListener('click', async () => {
-  const code = document.getElementById('pmCode').value.trim();
-  const msg = document.getElementById('pmMsg');
-  if (!code) return;
-  try {
-    const { data: days, error } = await sb.rpc('redeem_code', { p_code: code });
-    if (error) throw error;
-    me = await loadMyProfile(me.id); // 만료일 갱신
-    renderTopbar();
-    document.getElementById('pmStatus').textContent = `플러스 · ${fmtDate(me.plus_expires_at)}까지`;
-    msg.className = 'msg ok';
-    msg.textContent = `+${days}일이 적립됐어요! 팝! 🍿`;
-    document.getElementById('pmCode').value = '';
-  } catch (e) {
-    msg.className = 'msg bad';
-    msg.textContent = e.message || '코드 등록에 실패했어요.';
-  }
-});
-
-/* 관리자에게 요청 */
-document.getElementById('reqSend').addEventListener('click', async () => {
-  const content = document.getElementById('reqContent').value.trim();
-  const msg = document.getElementById('reqMsg');
-  if (!content) return;
-  const { error } = await sb.from('requests').insert({ user_id: me.id, content });
-  msg.className = error ? 'msg bad' : 'msg ok';
-  msg.textContent = error ? ('전송 실패: ' + error.message) : '요청을 보냈어요! 확인 후 반영할게요.';
-  if (!error) document.getElementById('reqContent').value = '';
-});
-
-/* 닉네임 변경 */
-document.getElementById('pmNickSave').addEventListener('click', async () => {
-  const nick = document.getElementById('pmNick').value.trim();
-  const msg = document.getElementById('pmNickMsg');
-  if (!nick) { msg.className = 'msg bad'; msg.textContent = '닉네임을 입력해 주세요.'; return; }
-  const { error } = await sb.from('profiles').update({ nickname: nick }).eq('id', me.id);
-  if (error) {
-    msg.className = 'msg bad';
-    msg.textContent = String(error.message).includes('duplicate')
-      ? '이미 사용 중인 닉네임이에요.' : '변경 실패: ' + error.message;
-    return;
-  }
-  me.nickname = nick;
-  msg.className = 'msg ok'; msg.textContent = '닉네임을 바꿨어요!';
-  renderTopbar();
-});
+/* 마이페이지는 account-panel.js에서 관리합니다. */
 
 /* 회원 탈퇴 — 두 번 확인 후 계정·데이터 전체 삭제 */
 document.getElementById('withdrawBtn').addEventListener('click', async () => {
@@ -1072,6 +1008,11 @@ document.getElementById('withdrawBtn').addEventListener('click', async () => {
 });
 
 document.getElementById('logoutBtn').addEventListener('click', logout);
+</script>
+<script src="js/account-rules.js?v=20261004-1"></script>
+<script src="js/account-panel.js?v=20261004-1"></script>
+<script>
+initAccountPanel({ getProfile:()=>me, setProfile:p=>{me=p;renderTopbar();}, getSettings:()=>settings });
 </script>
 <script src="js/support.js?v=20261004-2"></script>
 </body>

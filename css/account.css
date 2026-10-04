@@ -1,0 +1,30 @@
+#passModal .account-sheet {max-width:660px;padding:0!important;display:flex;flex-direction:column;max-height:90vh;max-height:90dvh;overflow:hidden;background:#f5f7fa;}
+#passModal .account-header {display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 24px;background:#fff;flex-shrink:0;}
+#passModal .account-header h2 {font-size:20px;margin:0;}
+#passModal .account-tabs {display:flex;gap:8px;padding:0 24px 16px;background:#fff;flex-shrink:0;}
+#passModal [role=tab] {flex:1;padding:12px 8px;border:0;border-radius:12px;background:#eef3f9;color:#334b68;font:600 14px 'Pretendard',sans-serif;cursor:pointer;}
+#passModal [role=tab][aria-selected=true] {background:#1e3a5f;color:#fff;}
+#passModal .account-body {overflow-y:auto;overscroll-behavior:contain;padding:24px;min-height:0;}
+#passModal .account-card {background:#fff;padding:24px;border-radius:18px;box-shadow:0 3px 16px #1e3a5f09;margin-bottom:18px;}
+#passModal .account-card:last-child {margin-bottom:0;}
+#passModal h3 {font-size:17px;font-weight:700;margin:0 0 16px;}
+#passModal .account-hint {font-size:13px;line-height:1.75;color:#526781;margin:10px 0 0;}
+#passModal .account-row {display:flex;gap:8px;align-items:center;}
+#passModal input {min-width:0;flex:1;width:100%;}
+#passModal .account-value {font-weight:600;overflow-wrap:anywhere;line-height:1.6;}
+#passModal .account-summary {background:#eaf4fe;padding:20px;border-radius:16px;margin-bottom:20px;}
+#passModal #pmStatus {font-size:24px;font-weight:800;}
+#passModal #pmExpiry {font-size:15px;margin:8px 0;}
+#passModal .account-actions {display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;}
+#passModal .account-actions a {text-decoration:none;}
+#passModal .pass-row {gap:14px;align-items:flex-start;padding:14px 0;}
+#passModal .pass-days {white-space:nowrap;}
+#passModal .pass-days.negative {color:#a84332;}
+#passModal .event-detail {display:block;font-size:12px;line-height:1.7;color:#526781;margin-top:4px;overflow-wrap:anywhere;}
+#passModal [hidden] {display:none!important;}
+#passModal button:focus-visible,#passModal a:focus-visible {outline:3px solid #b98506;outline-offset:3px;}
+#passModal .account-danger {background:transparent;border:0;color:#a84332;text-decoration:underline;cursor:pointer;font:inherit;padding:10px 0;}
+#passModal .account-loading {height:54px;border-radius:12px;background:linear-gradient(90deg,#edf2f7,#f8fafc,#edf2f7);background-size:200% 100%;animation:account-load 1.4s infinite;}
+@keyframes account-load {to{background-position:-200% 0;}}
+@media(max-width:540px){#passModal {padding:12px;}#passModal .account-header{padding:16px;}#passModal .account-tabs{padding:0 16px 12px;}#passModal .account-body{padding:16px;}#passModal .account-card{padding:18px;}#passModal .account-header h2{font-size:18px;}}
+@media(prefers-reduced-motion:reduce){#passModal .account-loading{animation:none;}}
