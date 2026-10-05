@@ -1,19 +1,19 @@
 /* Scoped footer, preserving the site's established brand palette. */
-#noripopFooter {box-sizing:border-box;width:100%;margin:64px 0 0;padding:40px max(24px, calc((100% - 1120px) / 2)) 24px;background:#f1f4f8;color:#334b68;opacity:1;border:0;box-shadow:0 -8px 24px rgba(30,58,95,.035);font:400 14px/1.7 'Pretendard',sans-serif;text-align:left;}
+#noripopFooter {box-sizing:border-box;width:100%;margin:64px 0 0;padding:48px max(24px, calc((100% - 1120px) / 2)) 24px;background:#193452;color:#e4edf6;opacity:1;border:0;border-top:4px solid #e8bd64;box-shadow:0 -8px 24px rgba(30,58,95,.08);font:400 14px/1.7 'Pretendard',sans-serif;text-align:left;}
 #noripopFooter * {box-sizing:border-box;}
 #noripopFooter .np-footer-main {display:grid;grid-template-columns:1.3fr 1fr 1.2fr;gap:36px;max-width:1120px;margin:auto;}
 #noripopFooter .np-footer-main > nav {display:block;padding:0;margin:0;background:none;box-shadow:none;}
-#noripopFooter h2 {font:700 14px/1.7 'Pretendard',sans-serif;color:#1e3a5f;margin:0 0 12px;}
-#noripopFooter a {color:#334b68;margin:0;text-decoration:none;display:block;width:fit-content;padding:6px 0;transition:color .2s;overflow-wrap:anywhere;}
-#noripopFooter a:hover {color:#15335b;text-decoration:underline;text-underline-offset:4px;}
+#noripopFooter h2 {font:700 14px/1.7 'Pretendard',sans-serif;color:#f5d58a;margin:0 0 12px;}
+#noripopFooter a {color:#e4edf6;margin:0;text-decoration:none;display:block;width:fit-content;padding:6px 0;transition:color .2s;overflow-wrap:anywhere;}
+#noripopFooter a:hover {color:#ffe2a0;text-decoration:underline;text-underline-offset:4px;}
 #noripopFooter a:focus-visible {outline:3px solid #bd8200;outline-offset:4px;border-radius:4px;}
-#noripopFooter .np-footer-brand > a {font-size:24px;font-weight:800;line-height:1.3;color:#1e3a5f;padding-top:0;}
+#noripopFooter .np-footer-brand > a {font-size:24px;font-weight:800;line-height:1.3;color:#fff4d9;padding-top:0;}
 #noripopFooter .np-footer-brand span {font-size:12px;font-weight:500;margin-left:6px;}
 #noripopFooter p {margin:12px 0 0;}
-#noripopFooter .np-footer-note {font-size:12px;line-height:1.8;color:#53667d;}
-#noripopFooter .np-footer-bottom {max-width:1120px;margin:28px auto 0;padding-top:20px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px 24px;border-top:1px solid #dbe3ed;}
+#noripopFooter .np-footer-note {font-size:12px;line-height:1.8;color:#bbccde;}
+#noripopFooter .np-footer-bottom {max-width:1120px;margin:28px auto 0;padding-top:20px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px 24px;border-top:1px solid #496079;}
 #noripopFooter .np-footer-bottom nav {display:flex;flex-wrap:wrap;gap:4px 24px;}
-#noripopFooter small {font-size:12px;color:#53667d;}
+#noripopFooter small {font-size:12px;color:#bbccde;}
 #noripopFooter .np-sr-only {position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;}
 @media(max-width:700px) {#noripopFooter {margin-top:40px;padding:28px 24px 24px;}#noripopFooter .np-footer-main {grid-template-columns:1fr 1fr;gap:24px;}#noripopFooter .np-footer-brand {grid-column:1 / -1;}#noripopFooter a {min-height:44px;display:flex;align-items:center;}}
 @media(max-width:420px) {#noripopFooter .np-footer-main {grid-template-columns:1fr;}}

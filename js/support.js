@@ -3,7 +3,7 @@
   if (document.getElementById('noripopFooter')) return;
   const stylesheet = document.createElement('link');
   stylesheet.rel = 'stylesheet';
-  stylesheet.href = new URL('../css/footer.css?v=20261004-2', document.currentScript.src).href;
+  stylesheet.href = new URL('../css/footer.css?v=20261006-1', document.currentScript.src).href;
   document.head.append(stylesheet);
   const footer = document.querySelector('footer') || document.createElement('footer');
   footer.id = 'noripopFooter';
