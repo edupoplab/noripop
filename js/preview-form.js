@@ -3,13 +3,13 @@ const previewForm = (() => {
   let images = [], testedUrl = '', busy = false, generation = 0;
   const box = document.createElement('details'); box.className = 'preview-fields';
   box.innerHTML = `<summary>미리보기 설정 <span id="previewSummary">직접 실행</span></summary><div class="preview-settings">
-    <p>공개할 때 확인해 주세요. 실행이 안 되면 사진으로 대신할 수 있어요.</p>
+    <p>공개할 때 확인해 주세요. 내부 실행이 제한되면 ‘활동 사진으로 보기’로 소개할 수 있어요. 사진은 미리보기만 대신하며 실제 놀이 실행은 별도로 확인해야 해요.</p>
     <label for="previewMode">보여줄 방식</label><select id="previewMode"><option value="iframe">직접 실행해 보기</option><option value="gallery">활동 사진으로 보기</option></select>
     <div id="previewRunFields"><button type="button" class="btn btn-ghost" id="previewTest">실행해 보기</button>
     <label class="preview-check"><input type="checkbox" id="previewChecked"> 직접 실행해 보니 잘 작동해요</label>
     <details><summary>내부 실행이 안 되나요? AI에게 수정 요청하기</summary>
-    <p>아래 내용을 복사해 제작 AI에게 요청한 뒤 다시 배포하고 테스트해 주세요. 주소의 직접 노출을 줄이는 기능이며 주소 추출을 완전히 막지는 못합니다.</p>
-    <textarea readonly aria-label="AI 수정 요청문">제가 만든 웹 활동을 ${location.origin} 의 놀이팝 iframe 안에서 실행할 수 있게 점검해 주세요. X-Frame-Options와 CSP frame-ancestors 등 배포 설정, 상위 창 이동과 팝업 의존 여부를 확인해 주세요. 필요한 출처만 허용하고 기존 인증과 접근 권한은 유지해 주세요. 놀이팝 미리보기는 allow-scripts allow-same-origin allow-forms allow-downloads sandbox를 사용하며 카메라·마이크·전체화면을 허용합니다. 로그인·저장·카메라 등 주요 기능을 이 환경에서 확인하고, 서버 설정 변경이 필요하면 방법을 안내해 주세요.</textarea></details>
+    <p>직접 수정할 수 있는 웹 활동에 쓰는 공통 점검 요청문이에요. Canva 등 외부 서비스의 제한은 이 요청문만으로 바꿀 수 없어요. 제작 AI에게 요청한 뒤 다시 배포하고 테스트해 주세요.</p>
+    <textarea readonly aria-label="AI 수정 요청문">제가 수정 권한을 가진 웹 활동을 ${location.origin} 의 놀이팝 iframe 안에서 실행할 수 있는지 점검해 주세요. 먼저 원본 주소와 iframe에서 각각 재현하고 원인을 구분해 주세요. X-Frame-Options, CSP frame-ancestors, 상위 창 이동, 팝업 의존, 쿠키와 저장소 제약을 확인해 주세요. 필요한 출처만 허용하고 기존 인증과 접근 권한은 유지해 주세요. 놀이팝 미리보기 sandbox는 allow-scripts allow-same-origin allow-forms allow-downloads이며 팝업과 상위 창 이동은 허용하지 않습니다. iframe allow에는 autoplay, camera, microphone, fullscreen이 있지만 실제 사용에는 브라우저와 기기 권한도 필요합니다. 로그인·저장·카메라 등 주요 기능을 실제 환경에서 확인해 주세요. 외부 서비스의 변경 불가능한 제한이면 해결됐다고 말하지 말고, 수정 가능한 코드·서버 설정과 수정 불가능한 항목을 구분해 안내해 주세요. 보안 제한을 일괄 해제하거나 모든 출처를 허용하지 마세요.</textarea></details>
     </div><div id="previewPhotoFields" hidden><label for="activityFiles">활동 사진 3~8장</label><p>시작·활동·결과 화면을 올려 주세요. 이름과 얼굴은 가려 주세요.</p>
     <input id="activityFiles" type="file" accept="image/jpeg,image/png,image/webp" multiple><small>JPG·PNG·WebP / 장당 10MB 이하</small><div class="activity-images"></div></div><p id="activityStatus" role="status"></p></div>`;
   document.getElementById('fUrl').after(box);
