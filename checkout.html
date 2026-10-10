@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>놀이팝 · 플러스 이용권 구매 준비</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link rel="stylesheet" href="css/pop.css">
+<style>
+body{margin:0;color:#1e3a5f;font-family:Pretendard,sans-serif;background:#fffaf0;line-height:1.7}.checkout{max-width:720px;margin:0 auto;padding:40px 20px 64px}.home{color:inherit;text-decoration:none;font-weight:800}.eyebrow{color:#356d63;margin-top:36px;font-size:14px}h1{font-size:30px;line-height:1.3;margin:8px 0 24px}.purchase-card{background:#f8fafc;border-radius:24px;padding:32px;box-shadow:0 10px 32px #1e3a5f0d}.price{font-size:36px;font-weight:800;margin:8px 0}.price small{font-size:15px;font-weight:500}.details{margin:24px 0;padding:0;list-style:none}.details li{padding:8px 0}.status{background:#e8f5f0;padding:20px;border-radius:16px}.status strong{display:block}.status p{margin:8px 0 0}.payment-button{display:block;width:100%;padding:16px;border:0;border-radius:16px;background:#ffcd37;color:#1e3a5f;font:700 16px Pretendard,sans-serif;margin-top:24px}.payment-button:disabled{background:#e3e8ee;color:#64748b;cursor:not-allowed}.links{display:flex;gap:18px;flex-wrap:wrap;margin-top:20px}.links a{color:#1e3a5f;transition:opacity .2s}.links a:hover{opacity:.7}.links a:active{transform:scale(.98)}.note{font-size:13px;color:#587087}a:focus-visible,button:focus-visible{outline:3px solid #1e3a5f;outline-offset:4px}@media(max-width:480px){.purchase-card{padding:24px}h1{font-size:26px}}
+</style>
+</head>
+<body>
+<main class="checkout">
+<a class="home" href="index.html">놀이팝</a>
+<p class="eyebrow">플러스 이용권 · 청구 없는 시험 화면</p>
+<h1>우리 반 놀이를 더 편하게</h1>
+<section class="purchase-card" aria-labelledby="productTitle">
+<h2 id="productTitle">놀이팝 플러스 30일권</h2>
+<p class="price">4,900원 <small>/ 30일 · 최종 결제금액</small></p>
+<ul class="details">
+<li>온라인 서비스 이용권이며 실물 배송은 없습니다.</li>
+<li>이용기간은 달력 기준 한 달이 아닌 30일입니다.</li>
+<li>자동 연장 결제는 원하는 회원만 별도로 선택하는 방식으로 준비합니다.</li>
+<li>무료·활동 보상 기간과 유료 기간은 구분하며 구매 전 시작일을 안내합니다.</li>
+</ul>
+<div class="status" role="status"><strong>시험 모드 · 실제 결제되지 않습니다.</strong><p id="paymentStatus">시험 연결을 준비하고 있습니다. 운영 이용권과 적립 내역에는 반영하지 않습니다. 자동 결제 등록도 하지 않습니다.</p></div>
+<button id="testPayment" class="payment-button" type="button" disabled>시험 연결 확인 중</button>
+<div class="links"><a href="terms.html#refund">환불 정책 확인</a><a href="privacy.html">개인정보 처리방침</a><a href="my.html">마이페이지로 돌아가기</a></div>
+<p class="note">심사용 계정은 일반 회원 권한만 사용합니다. 관리자 계정과 실제 회원 자료는 제공하지 않습니다.</p>
+</section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.3/dist/umd/supabase.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/common.js?v=20260921-1"></script>
+<script src="https://js.tosspayments.com/v2/standard"></script>
+<script src="js/payment-test.js"></script>
+<script src="js/support.js?v=20261006-1"></script>
+</body></html>
