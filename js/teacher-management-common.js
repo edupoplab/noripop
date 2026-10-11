@@ -1,0 +1,102 @@
+/* ══════════════ 놀이팝 공통 스크립트 ══════════════
+ * 모든 페이지에서 config.js 다음에 불러옵니다.
+ * Supabase 클라이언트 생성 + 자주 쓰는 도우미 함수 모음.
+ * ═══════════════════════════════════════════════════ */
+
+// Supabase 클라이언트 (supabase-js v2 CDN이 먼저 로드돼 있어야 함)
+const sb = window.supabase.createClient(POP_CONFIG.SUPABASE_URL, POP_CONFIG.SUPABASE_ANON_KEY);
+
+// Only absolute HTTPS play addresses; never execute URL schemes as code.
+function safePlayUrl(value) {
+  if (typeof value !== 'string' || !/^https:\/\//i.test(value.trim()) || /[\u0000-\u0020\u007f]/.test(value.trim())) return null;
+  try {
+    const url = new URL(value.trim());
+    return url.protocol === 'https:' && url.hostname && !url.username && !url.password ? url.href : null;
+  } catch { return null; }
+}
+
+// HTML 이스케이프 (XSS 방지 — 사용자 입력을 화면에 넣을 때 항상 사용)
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// app_settings 전체를 { key: value } 형태로 로드
+async function loadSettings() {
+  const { data, error } = await sb.from('app_settings').select('key, value');
+  if (error) throw error;
+  const out = {};
+  (data || []).forEach(r => { out[r.key] = r.value; });
+  // 저장 순서와 관계없이 ‘주제 무관’은 모든 주제 선택 목록의 마지막에 표시합니다.
+  out.themes = [...new Set([...(out.themes || []).map(t => t === '생명과 우주' ? '지구와 우주' : t), '기본생활습관', '감정'])].filter(t => t !== '주제 무관');
+  out.themes.push('주제 무관');
+  return out;
+}
+
+// 저장된 기존 태그 값은 보존하고 새 교육 용어로 표시합니다.
+function aiLabel(name) {
+  return ({'AI 이해':'Of AI (이해)','AI와 창작':'With AI (창작)','AI로 성찰':'From AI (성찰)','AI 환경·균형':'In AI (환경)','AI 윤리·안전':'AI 윤리 (안전)'})[name] || name;
+}
+function matchesTheme(themes, selected) {
+  const values = (themes || []).map(t => t === '생명과 우주' ? '지구와 우주' : t);
+  return selected === '전체' || values.includes('주제 무관') || values.includes(selected);
+}
+
+// 점수 → 레벨 (level_thresholds 설정과 대조)
+function levelOf(points, thresholds) {
+  const list = (thresholds || []).slice().sort((a, b) => a.min - b.min);
+  let cur = list[0] || { name: '알맹이', emoji: '🌽', min: 0 };
+  for (const t of list) if (points >= t.min) cur = t;
+  return cur;
+}
+
+// 레벨 뱃지 HTML
+function levelBadge(points, thresholds) {
+  const lv = levelOf(points, thresholds);
+  return `<span class="lv-badge" title="${points}점">${lv.emoji || '🍿'} ${esc(lv.name)}</span>`;
+}
+
+// 플러스 여부 (만료일이 오늘 이후면 플러스)
+function isPlusDate(plusExpiresAt) {
+  if (!plusExpiresAt) return false;
+  return new Date(plusExpiresAt + 'T23:59:59') >= new Date();
+}
+
+// 날짜를 "2026년 7월 9일"로
+function fmtDate(d) {
+  if (!d) return '-';
+  const dt = new Date(d);
+  return `${dt.getFullYear()}년 ${dt.getMonth() + 1}월 ${dt.getDate()}일`;
+}
+
+// Dedicated login without redirects to the commercial website.
+async function requireAuth() {
+  const {data:{session}} = await sb.auth.getSession();
+  const workspace=document.getElementById('teacherWorkspace');
+  const form=document.getElementById('teacherLoginForm');
+  const panel=document.getElementById('teacherLogin');
+  if(session){panel.hidden=true;workspace.hidden=false;return session;}
+  workspace.hidden=true;panel.hidden=false;
+  return new Promise(resolve=>{form.onsubmit=async event=>{
+    event.preventDefault();const button=form.querySelector('button');button.disabled=true;
+    const message=document.getElementById('teacherLoginMessage');message.textContent='확인 중…';
+    try{const {data,error}=await sb.auth.signInWithPassword({email:document.getElementById('teacherEmail').value.trim(),password:document.getElementById('teacherPassword').value});
+      if(error)throw error;if(!data.session)throw Error('No session');
+      document.getElementById('teacherPassword').value='';panel.hidden=true;workspace.hidden=false;resolve(data.session);
+    }catch{message.textContent='로그인하지 못했어요. 이메일·비밀번호와 인터넷 연결을 확인해 주세요.';}
+    finally{button.disabled=false;}
+  };});
+}
+
+// 내 프로필 로드
+async function loadMyProfile(userId) {
+  const { data, error } = await sb.from('profiles').select('*').eq('id', userId).single();
+  if (error) throw error;
+  return data;
+}
+
+// 출석 체크 (하루 1회 — 실패해도 화면 흐름은 막지 않음)
+async function checkIn() {
+  try { await sb.rpc('check_in'); } catch (e) { console.warn('출석 체크 실패', e); }
+}
+
+async function logout(){await sb.auth.signOut();location.reload();}
