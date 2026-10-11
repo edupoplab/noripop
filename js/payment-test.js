@@ -3,6 +3,21 @@
   const button = document.getElementById('testPayment');
   const status = document.getElementById('paymentStatus');
   const endpoint = POP_CONFIG.SUPABASE_URL + '/functions/v1/payment-test';
+  const format = value => new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',dateStyle:'long',timeStyle:'short'}).format(new Date(value));
+  async function showPasses() {
+    const target = document.getElementById('testPasses');
+    target.textContent = '시험 이용권을 확인하고 있습니다…';
+    try {
+      const data = await call({action:'status'});
+      target.replaceChildren();
+      if (!data.items.length) { target.textContent = '아직 승인된 시험 이용권이 없습니다.'; return; }
+      for (const item of data.items) {
+        const p = document.createElement('p');
+        p.textContent = `시험 30일권 · ${format(item.startsAt)}부터 ${format(item.endsAt)}까지 · 실제 플러스 기능에는 적용되지 않아요.`;
+        target.append(p);
+      }
+    } catch (e) {target.textContent = e.message || '시험 내역을 불러오지 못했습니다.';}
+  }
   async function call(body) {
     const {data:{session}} = await sb.auth.getSession();
     if (!session) throw new Error('먼저 회원 계정으로 로그인해주세요.');
@@ -33,8 +48,10 @@
     button.disabled = true;
     status.textContent = '서버에서 시험 승인 결과를 확인하고 있습니다…';
     call({action:'confirm',orderId:query.get('orderId'),paymentKey:query.get('paymentKey'),amount:Number(query.get('amount'))})
-      .then(() => {status.textContent = '시험 결제 승인이 완료되었습니다. 실제 청구·이용권 지급·자동 결제 등록은 없습니다.';history.replaceState(null,'','checkout.html');})
+      .then(async () => {status.textContent = '시험 결제 승인과 시험용 30일권 발급이 완료되었습니다. 실제 청구·운영 이용권 변경·자동 결제 등록은 없습니다.';history.replaceState(null,'','checkout.html');await showPasses();})
       .catch(e => {status.textContent = e.message;})
       .finally(() => {button.disabled = false;});
   }
+  document.getElementById('testPassesRefresh').addEventListener('click',showPasses);
+  if (query.get('result') !== 'success') showPasses();
 })();

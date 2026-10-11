@@ -16,6 +16,17 @@ window.initAccountPanel = function({getProfile,setProfile,getSettings}) {
     ['info','pass','help'].forEach(n=>el('pmPanel-'+n).hidden=n!==name);
     modal.querySelector('.account-body').scrollTop=0;
     if(name==='pass'&&!eventsStarted)loadEvents();
+    if(name==='pass')loadTestPasses();
+  }
+  async function loadTestPasses(){
+    const stamp=epoch, uid=getProfile().id;
+    const {data,error}=await sb.from('payment_test_entitlements').select('starts_at,ends_at').eq('user_id',uid).order('starts_at',{ascending:false}).limit(20);
+    if(stamp!==epoch||!opened)return;
+    el('pmTestCard').hidden=!error&&!data?.length;
+    const target=el('pmTestPasses');target.replaceChildren();
+    if(error){target.textContent='시험 내역을 불러오지 못했습니다. 탭을 다시 열어 확인해 주세요.';return;}
+    const format=v=>new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',dateStyle:'long',timeStyle:'short'}).format(new Date(v));
+    for(const item of data){const p=document.createElement('p');p.className='account-hint';p.textContent=`시험 30일권 · ${format(item.starts_at)} ~ ${format(item.ends_at)}`;target.append(p);}
   }
   function paintEvents(){
     el('pmEvents').innerHTML=events.length?events.map(ev=>`<div class="pass-row"><div><span>${esc(rules.labels[ev.kind]||'기타 이용기간 내역')}</span><span class="event-detail">${esc(rules.kstDate(ev.created_at))}${ev.note?' · '+esc(ev.note):''}</span></div><span class="pass-days ${Number(ev.days)<0?'negative':''}">${esc(rules.days(ev.days))}</span></div>`).join(''):'<p class="account-hint">아직 적립·조정 내역이 없습니다. 이용권을 등록하거나 놀이를 공유해 보세요.</p>';
