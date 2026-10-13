@@ -79,6 +79,17 @@
 </style>
 <link rel="stylesheet" href="css/pop.css">
 <link rel="stylesheet" href="css/preview.css?v=20260921-1">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.css">
+<style>
+  .tabs .tab, #tab-payments, #tab-codes {font-family:Pretendard,sans-serif;}
+  #tab-payments h2, #tab-codes h2, #tab-payments button, #tab-codes button {font-family:inherit;font-weight:700;}
+  .tab,.btn {transition:transform .2s,filter .2s;}
+  .tab:hover,.btn:hover {filter:brightness(.97);transform:translateY(-1px);}
+  .tab:active,.btn:active {transform:scale(.97);}
+  #tab-payments h3,#tab-codes h3 {font-size:16px;margin-bottom:12px;}
+  #paymentStatus,#grantStatus {font-size:13px;line-height:1.8;padding:8px 0;}
+  #paymentMore[hidden] {display:none;}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -95,7 +106,8 @@
     <button class="tab" data-tab="review">🔍 검수 <span class="n" id="nPending" style="display:none"></span></button>
     <button class="tab" data-tab="plays">🏅 공개 놀이</button>
     <button class="tab" data-tab="members">👩‍🏫 회원</button>
-    <button class="tab" data-tab="codes">🎟️ 코드</button>
+    <button class="tab" data-tab="payments">💳 결제·구독</button>
+    <button class="tab" data-tab="codes">🎟️ 이용권 관리</button>
     <button class="tab" data-tab="reqs">✉️ 요청함 <span class="n" id="nReqs" style="display:none"></span></button>
     <button class="tab" data-tab="notice">📢 공지</button>
     <button class="tab" data-tab="settings">⚙️ 정책 설정</button>
@@ -132,8 +144,12 @@
 
   <!-- 코드 -->
   <div class="panel" id="tab-codes" style="display:none">
-    <h2>이용권 코드 발급</h2>
-    <p class="checklist">아임웹에서 이용권이 팔리면 → 여기서 코드를 발급해 구매자에게 전달하세요. 회원은 "이용권·적립" 창에서 코드를 입력해요.</p>
+    <h2>이용권 관리</h2>
+    <p class="checklist">무료·활동 보상·운영자 지급 내역과 이용권 코드를 관리합니다. 코드 발급은 체험·연수·기관 제공용이며 결제 승인 내역과 별개입니다. 기존 코드는 유지됩니다.</p>
+    <h3>이용권 지급 내역</h3>
+    <p id="grantStatus" role="status"></p>
+    <div style="overflow-x:auto"><table id="grantTable"></table></div>
+    <h3 style="margin-top:24px">코드 발급</h3>
     <div class="set-row">
       <span>기간</span><input type="number" id="codeDays" value="30" min="1"> 일 ×
       <input type="number" id="codeCount" value="1" min="1" max="50"> 개
@@ -145,6 +161,17 @@
   </div>
 
   <!-- 요청함 -->
+  <div class="panel" id="tab-payments" style="display:none">
+    <h2>결제·구독</h2>
+    <p class="checklist">실제 판매·월 구독은 아직 연결되지 않았습니다. 시험 승인은 매출이 아니며 실제 청구도 없습니다. 환불 실행은 제공하지 않습니다.</p>
+    <div class="set-row"><strong>실제 결제: 연결 준비 중</strong><span>월 구독: 구현 준비 중</span></div>
+    <h3 style="margin-top:20px">시험 결제 조회</h3>
+    <p class="item-meta">최근 주문을 최신순으로 조회합니다. ‘생성됨’은 미승인 상태이며 취소·실패를 구분해 저장하는 기능은 아직 없습니다.</p>
+    <div class="set-row"><button class="btn btn-ghost mini" id="paymentRefresh">새로고침</button><span id="paymentStatus" role="status"></span></div>
+    <div style="overflow-x:auto"><table id="paymentTable"></table></div>
+    <button class="btn btn-ghost mini" id="paymentMore" hidden>다음 내역</button>
+  </div>
+
   <div class="panel" id="tab-reqs" style="display:none">
     <h2>관리자에게 요청</h2>
     <div id="reqList"></div>
@@ -227,12 +254,13 @@ const SETTING_LABELS = {
 function bindTabs() {
   document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === t));
-    ['dash','review','plays','members','codes','reqs','notice','settings'].forEach(id =>
+    ['dash','review','plays','members','codes','payments','reqs','notice','settings'].forEach(id =>
       document.getElementById('tab-' + id).style.display = t.dataset.tab === id ? 'block' : 'none');
     // 탭 열 때 데이터 로드
     if (t.dataset.tab === 'plays') loadPublic();
     if (t.dataset.tab === 'members') loadMembers();
-    if (t.dataset.tab === 'codes') loadCodes();
+    if (t.dataset.tab === 'codes') { loadCodes(); loadGrantHistory(); }
+    if (t.dataset.tab === 'payments') loadAdminPayments(true);
     if (t.dataset.tab === 'reqs') loadRequests();
     if (t.dataset.tab === 'notice') loadNotices();
     if (t.dataset.tab === 'settings') renderSettings();
@@ -524,6 +552,7 @@ document.getElementById('setSave').addEventListener('click', async () => {
 });
 </script>
 <script src="js/notice-rules.js?v=20261004-1"></script>
+<script src="js/admin-billing.js?v=20261013-1"></script>
 <script src="js/notice-admin.js?v=20261004-1"></script>
 <script src="js/support.js?v=20261006-1"></script>
 </body>
