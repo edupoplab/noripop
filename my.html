@@ -345,6 +345,7 @@
 <script src="js/name-dialog.js?v=20260926-2"></script>
 <script src="js/preview.js?v=20261007-1"></script>
 <script src="js/preview-form.js?v=20261007-1"></script>
+<script src="js/account-deletion.js?v=20261018-1"></script>
 <script>
 const PALETTE = ['#6ED3BF', '#FFC93C', '#FF7B6B', '#8FB8F6', '#C9A0F0'];
 
@@ -996,16 +997,29 @@ function renderList() {
 
 /* 마이페이지는 account-panel.js에서 관리합니다. */
 
-/* 회원 탈퇴 — 두 번 확인 후 계정·데이터 전체 삭제 */
+/* 회원 탈퇴 — 두 번 확인, 실패와 별도 파일 삭제를 구분 */
 document.getElementById('withdrawBtn').addEventListener('click', async () => {
-  if (!confirm('정말 탈퇴할까요?\n등록한 놀이·반·적립 내역이 모두 삭제되고 되돌릴 수 없어요.')) return;
+  const button = document.getElementById('withdrawBtn');
+  if (button.disabled) return;
+  if (!confirm('정말 탈퇴할까요?\n놀이팝에 직접 올린 사진·썸네일과 계정의 등록 자료를 삭제해요. 다른 선생님이 저장한 내 놀이에도 영향을 줄 수 있어요.\n삭제한 파일은 복구할 수 없고, 도중에 실패해도 이미 삭제한 파일은 돌아오지 않아요. 외부 사이트나 기기에 저장한 자료는 삭제하지 않아요.')) return;
   const typed = prompt('탈퇴를 진행하려면 "탈퇴"라고 입력해 주세요.');
   if (typed !== '탈퇴') return;
-  const { error } = await sb.rpc('delete_account');
-  if (error) return alert('탈퇴 처리에 실패했어요: ' + error.message);
-  alert('탈퇴가 완료됐어요. 그동안 함께해 주셔서 고마웠어요! 🍿');
-  await sb.auth.signOut();
-  location.href = 'index.html';
+  button.disabled = true;
+  try {
+    await accountDeletion.run(sb);
+    alert('놀이팝에 직접 올린 사진·썸네일과 계정 삭제가 처리됐어요.\n외부 사이트·기기 저장본과 별도 보유 대상 기록은 이 삭제에 포함되지 않아요.');
+    // The account deletion succeeded even if network sign-out subsequently fails.
+    try { await sb.auth.signOut(); } catch (_) { /* Continue to a public page. */ }
+    location.href = 'index.html';
+  } catch (error) {
+    if (error.stage === 'preflight') {
+      alert('삭제 준비를 확인하지 못해 파일과 계정을 삭제하지 않았어요.\n다시 로그인한 뒤 시도하거나 edupoplab@gmail.com으로 문의해 주세요. 비밀번호와 PIN은 보내지 마세요.');
+    } else {
+      alert('탈퇴 완료 여부를 확인하지 못했어요. 일부 파일은 이미 삭제됐을 수 있어요.\n다시 로그인해 확인하거나 재시도해 주세요. 계속 문제가 있으면 edupoplab@gmail.com으로 문의해 주세요. 비밀번호와 PIN은 보내지 마세요.');
+    }
+  } finally {
+    button.disabled = false;
+  }
 });
 
 document.getElementById('logoutBtn').addEventListener('click', logout);
